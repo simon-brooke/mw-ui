@@ -1,0 +1,27 @@
+td.waste {
+ 	background-color: gray;
+}	
+
+td.pasture {
+	background-color: lime;
+}
+
+td.scrub {
+	background-color: chartreuse;
+}
+
+td.scrub2 {
+ 	background-color: lime;
+}
+
+td.forest {
+ 	background-color: forestgreen;
+}
+
+td.climax {
+	background-color: olive;
+}
+
+td.fire {
+ 	background-color: orange;
+}
