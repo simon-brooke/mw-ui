@@ -17,38 +17,47 @@
   [statekey]
   (format "img/tiles/%s.png" (format-css-class statekey)))
 
-(defn render-cell 
+(defn render-cell
   "Render this world cell as a Hiccup table cell."
   [cell]
   (let [state (:state cell)]
-    [:td {:class (format-css-class state)} 
+    [:td {:class (format-css-class state)}
             [:img {:alt (world/format-cell cell) :img (format-image-path state)}]]))
 
-(defn render-world-row 
+(defn render-world-row
   "Render this world row as a Hiccup table row."
   [row]
   (apply vector (cons :tr (map render-cell row))))
 
-(defn render-world 
-  "Render this world as a complete HTML page."
+(defn render-world-table
+  "Render the world implied by the session as a complete HTML page."
   []
   (let [world (or (session/get :world) (world/make-world 20 20))
         rules (or (session/get :rules) rules/natural-rules)
+        generation (+ (or (session/get :generation) 0) 1)
         w2 (engine/transform-world world rules)]
     (session/put! :world w2)
-    (html
-      [:html
-       [:head
-        [:title "MicroWorld demo"]
-        [:link {:media "only screen and (max-device-width: 480px)" :href "css/phone.css" :type  "text/css" :rel "stylesheet"}]
-        [:link {:media "only screen and (min-device-width: 481px) and (max-device-width: 1024px)" :href "css/tablet.css" :type "text/css" :rel "stylesheet"}]
-        [:link {:media "screen and (min-device-width: 1025px)" :href "css/standard.css" :type "text/css" :rel "stylesheet"}]
-        [:link {:media "print" :href "css/print.css" :type "text/css" :rel "stylesheet"}]
-        [:link {:href "css/states.css" :type "text/css" :rel "stylesheet"}]
-        [:meta {:http-equiv "refresh" :content "5"}]]
-       [:body
-        [:h1 "MicroWorld"]
-        (apply vector 
-               (cons :table
-                     (map render-world-row w2)))]])))
-      
+    (session/put! :generation generation)
+    [:div {:class "world"}
+     [:p (str "Generation " generation)]
+      (apply vector
+                 (cons :table
+                       (map render-world-row w2)))]))
+
+(defn render-world
+  "Render the world implied by the session as a complete HTML page."
+  []
+  (html
+   [:html
+    [:head
+     [:title "MicroWorld demo"]
+     [:link {:media "only screen and (max-device-width: 480px)" :href "css/phone.css" :type  "text/css" :rel "stylesheet"}]
+     [:link {:media "only screen and (min-device-width: 481px) and (max-device-width: 1024px)" :href "css/tablet.css" :type "text/css" :rel "stylesheet"}]
+     [:link {:media "screen and (min-device-width: 1025px)" :href "css/standard.css" :type "text/css" :rel "stylesheet"}]
+     [:link {:media "print" :href "css/print.css" :type "text/css" :rel "stylesheet"}]
+     [:link {:href "css/states.css" :type "text/css" :rel "stylesheet"}]
+     [:meta {:http-equiv "refresh" :content "5"}]]
+    [:body
+     [:h1 "MicroWorld"]
+     (render-world-table)
+     ]]))

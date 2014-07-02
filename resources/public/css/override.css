@@ -1,0 +1,50 @@
+/**
+ * CSS rules added to override those in existing stylesheets in the interests of better look'n'feel
+ */
+
+
+/* this lot taken from an embedded style element within the jot form */
+
+.form-label{
+/*  width:149px !important; */
+}
+
+.form-label-left{
+/*  width:149px !important; */
+}
+
+.form-line{
+  list-style: none;
+  margin: 0.5 0.5em;
+/*  padding-top:12px;
+  padding-bottom:12px; */
+}
+
+.form-label-right{
+/*  width:149px !important; */
+}
+
+body, html{
+  margin:0;
+  padding:0;
+  background:false;
+}
+
+.form-all{
+  margin:0px auto;
+/*  padding-top:20px;
+  width:390px; */
+  color:#555 !important;
+  font-family:'Arial';
+/*  font-size:12px; */
+}
+
+.form-radio-item label, .form-checkbox-item label, .form-grading-label, .form-header {
+  color:#555;
+}
+
+.form-required {
+  color: red;
+}
+/* end of group from the embedded style element within the jot form */
+
