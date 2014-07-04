@@ -3,6 +3,7 @@
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [mw-engine "0.1.0-SNAPSHOT"]
+                 [mw-parser "0.1.0-SNAPSHOT"]
                  [lib-noir "0.8.4"]
                  [ring-server "0.3.1"]
                  [selmer "0.6.8"]
@@ -14,7 +15,8 @@
 
   :repl-options {:init-ns mw-ui.repl}
   :plugins [[lein-ring "0.8.10"]
-            [lein-environ "0.5.0"]]
+            [lein-environ "0.5.0"]
+            [lein-marginalia "0.7.1"]]
   :ring {:handler mw-ui.handler/app
          :init    mw-ui.handler/init
          :destroy mw-ui.handler/destroy}

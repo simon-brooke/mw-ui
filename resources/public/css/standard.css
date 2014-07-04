@@ -37,6 +37,8 @@ body {
   position: fixed;
   z-index: 149;
   background-color: black;
+  background-image: "../img/earth-space-strip.jpg";
+  background-repeat: no-repeat;
   color: white;
 }
 
@@ -122,23 +124,4 @@ label {
   border-right: thin solid gray;
 }
 
-table {
-  width 100%;
-  padding: 0;
-  border: 0.25em solid silver;
-}
 
-td, th {
-  margin: 0;
-  padding: 0.25em 1em;
-}
-
-th {
-  border: thin solid gray;
-  background-color: silver;
-}
-
-td {
-  border: thin solid silver;
-  background-color: white;
-}

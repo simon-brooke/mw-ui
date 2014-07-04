@@ -1,16 +1,20 @@
 td.waste {
  	background-color: gray;
-}	
+}
 
-td.pasture {
+td.water {
+ 	background-color: blue;
+}
+
+td.pasture, td.grassland {
 	background-color: lime;
 }
 
-td.scrub {
+td.heath {
 	background-color: chartreuse;
 }
 
-td.scrub2 {
+td.scrub {
  	background-color: lime;
 }
 

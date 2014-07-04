@@ -1,6 +1,7 @@
 (ns mw-ui.render-world
   (:require [mw-engine.core :as engine]
             [mw-engine.world :as world]
+            [mw-engine.heightmap :as heightmap]
             [mw-engine.natural-rules :as rules]
             [hiccup.core :refer [html]]
             [noir.session :as session]))
@@ -32,7 +33,12 @@
 (defn render-world-table
   "Render the world implied by the session as a complete HTML page."
   []
-  (let [world (or (session/get :world) (world/make-world 20 20))
+  (let [world (or (session/get :world)
+                  (engine/transform-world
+                   (heightmap/apply-heightmap
+                    (world/make-world 20 20)
+                    "resources/public/img/20x20/hill.png")
+                   rules/init-rules))
         rules (or (session/get :rules) rules/natural-rules)
         generation (+ (or (session/get :generation) 0) 1)
         w2 (engine/transform-world world rules)]
