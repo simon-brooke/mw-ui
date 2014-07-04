@@ -1,0 +1,14 @@
+{% extends "templates/base.html" %}
+{% block content %}
+    <div>
+        <ul>
+        	{% for component in components %}
+        	<li>
+        		<a href="{{servlet-context}}/docs/{{component}}/uberdoc.html">
+        			{{component}}
+        		</a>
+        	</li>
+        	{% endfor %}
+        </ul>
+    </div>
+{% endblock %}

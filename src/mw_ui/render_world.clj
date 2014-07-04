@@ -23,7 +23,7 @@
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state)}
-            [:img {:alt (world/format-cell cell) :img (format-image-path state)}]]))
+            [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]))
 
 (defn render-world-row
   "Render this world row as a Hiccup table row."
@@ -41,7 +41,8 @@
                    rules/init-rules))
         rules (or (session/get :rules) rules/natural-rules)
         generation (+ (or (session/get :generation) 0) 1)
-        w2 (engine/transform-world world rules)]
+        w2 (engine/transform-world world rules)
+        ]
     (session/put! :world w2)
     (session/put! :generation generation)
     [:div {:class "world"}
@@ -64,6 +65,5 @@
      [:link {:href "css/states.css" :type "text/css" :rel "stylesheet"}]
      [:meta {:http-equiv "refresh" :content "5"}]]
     [:body
-     [:h1 "MicroWorld"]
      (render-world-table)
      ]]))

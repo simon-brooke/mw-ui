@@ -14,9 +14,17 @@
   (layout/render "about.html" {:title "About MicroWorld" :content (util/md->html "/md/about.md")}))
 
 (defn world-page []
-  (layout/render "world.html" {:title "Watch your world grow" :content (html (world/render-world-table)) :seconds (or (session/get :seconds) 5) :maybe-refresh "refresh"}))
+  (layout/render "world.html" {:title "Watch your world grow" 
+                               :content (html (world/render-world-table)) 
+                               :seconds (or (session/get :seconds) 5) 
+                               :maybe-refresh "refresh"}))
+
+(defn docs-page []
+  (layout/render "docs.html" {:title "Documentation"
+                              :components ["mw-engine" "mw-parser" "mw-ui"]}))
 
 (defroutes home-routes
   (GET "/" [] (home-page))
   (GET "/about" [] (about-page))
-  (GET "/world" [] (world-page)))
+  (GET "/world" [] (world-page))
+  (GET "/docs"  [] (docs-page)))
