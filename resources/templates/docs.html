@@ -1,6 +1,54 @@
 {% extends "templates/base.html" %}
 {% block content %}
     <div>
+    	<a name="top"/>
+    	<menu>
+    		<li><a href="#top">Top</a></li>
+    		<li><a href="#parser">Rule language</a></li>
+    		<li><a href="#states">Implemented states</a></li>
+    		<li><a href="#api">API documentation</a></li>
+    	</menu>
+    	<hr/>
+    	<a name="parser"/>
+    	{{parser|safe}}
+    	<hr/>
+    	<menu>
+    		<li><a href="#top">Top</a></li>
+    		<li><a href="#parser">Rule language</a></li>
+    		<li><a href="#states">Implemented states</a></li>
+    		<li><a href="#api">API documentation</a></li>
+    	</menu>
+    	<hr/>
+    	<h2><a name="states">Implemented states</h2>
+    	<p>As it says in the rule language documentation, above, you can use
+    	any sequence of alphanumeric characters you want as the name of a state  
+    	&emdash; you can call it whatever you like. However, if you use state
+    	names that there aren't already tiles for, and aren't already classes
+    	for in the CSS file, your states won't be displayed nicely in the
+    	<a href="{{servlet-context}}/">World</a> display. The states for which
+    	there are already tiles are:</p>
+    	<ul>
+    	{% for state in states %}
+    		<li>
+    			{{state}} 
+    			<img src="{{servlet-context}}/img/tiles/{{state}}.png"/>
+    		</li>
+    	{% endfor %}
+    	</ul>
+    	
+    	<hr/>
+    	<menu>
+    		<li><a href="#top">Top</a></li>
+    		<li><a href="#parser">Rule language</a></li>
+    		<li><a href="#states">Implemented states</a></li>
+    		<li><a href="#api">API documentation</a></li>
+    	</menu>
+    	<hr/>
+    	<h2><a name="api">API documentation</a></h2>
+
+		<p>If you're adventurous you may want to modify the MicroWorld engine
+		itself. To do that you'll need this documentation.
+    	
         <ul>
         	{% for component in components %}
         	<li>

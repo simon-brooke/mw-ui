@@ -18,11 +18,14 @@
   [statekey]
   (format "img/tiles/%s.png" (format-css-class statekey)))
 
+(defn format-mouseover [cell]
+  (str "State " (:state cell) "; altitude: " (:altitude cell) "; fertility: " (:fertility cell)))
+
 (defn render-cell
   "Render this world cell as a Hiccup table cell."
   [cell]
   (let [state (:state cell)]
-    [:td {:class (format-css-class state)}
+    [:td {:class (format-css-class state) :title (format-mouseover cell)}
             [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]))
 
 (defn render-world-row
@@ -46,10 +49,11 @@
     (session/put! :world w2)
     (session/put! :generation generation)
     [:div {:class "world"}
-     [:p (str "Generation " generation)]
+     
       (apply vector
                  (cons :table
-                       (map render-world-row w2)))]))
+                       (map render-world-row w2)))
+      [:p (str "Generation " generation)]]))
 
 (defn render-world
   "Render the world implied by the session as a complete HTML page."

@@ -1,19 +1,6 @@
 {% extends "templates/base.html" %}
 {% block content %}
   <div>
-      <form action="world">
-          <p class="widget">
-            <label for="y">Size of your world: rows</label>
-            <input name="y" type="range" min="5" max="100" value="{{y}}" required/>
-          </p>
-          <p class="widget">
-            <label for="y">Size of your world: columns</label>
-            <input name="x" type="range" min="5" max="100" value="{{x}}" required/>
-          </p>
-          <p class="widget">
-            <label for="submit">&nbsp;</label>
-            <input name="submit" id="submit" type="submit" value="Go!"/>
-          </p>
-      </form>
+    {{content|safe}}
   </div>
 {% endblock %}

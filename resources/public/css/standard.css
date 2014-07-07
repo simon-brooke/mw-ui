@@ -64,9 +64,11 @@ body {
   margin: 0;
   display: inline;
 }
-.nav-item a { color: rgb(64, 64, 64);
+
+#nav ul li a { 
+  color: white;
   text-decoration: none;
-  font-weight: normal;
+  font-weight: bold;
   padding: 0.25em 0.75em;
   margin: 0;
 }
