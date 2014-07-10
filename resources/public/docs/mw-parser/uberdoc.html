@@ -3037,16 +3037,24 @@ net.brehaut.ClojureTools = (function (SH) {
 <li>"if altitude is 100 or fertility is 25 then state should be heath"</li>
 <li>"if deer is more than 2 and wolves is 0 and fertility is more than 20 then deer should be deer + 2"</li>
 <li>"if deer is more than 1 and wolves is more than 1 then deer should be deer - wolves"</li>
+<li>"if state is grassland and 4 neighbours have state equal to water then state should be village"</li>
+<li>"if state is forest and fertility is between 55 and 75 then state should be climax"</li>
+<li>"if 6 neighbours have state equal to water then state should be village"</li>
+<li>"if state is in grassland or pasture or heath and 4 neighbours are water then state should be village"</li>
+<li>"if state is forest or state is climax and some neighbours have state equal to fire then 3 in 5 chance that state should be fire"</li>
+<li>"if state is pasture and more than 3 neighbours have state equal to scrub then state should be scrub"</li>
+* 
 </ul>
 
-<p>It should also but does not yet parse rules of the form:</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><ul>
-<li>"if 6 neighbours have state is water then state should be fishery"</li>
-<li>"if state is forest or state is climax and some neighbours have state is fire then 3 in 5 chance that state should be fire"</li>
-<li>"if state is pasture and more than 3 neighbours have state is scrub then state should be scrub"</li>
-</ul>
+<p>it generates rules in the form expected by <code>mw-engine.core</code>, q.v.</p>
 
-<p>it generates rules in the form expected by mw-engine.core</p>
+<p>It is, as I say, very simple; it generates a complete rule, or it fails completely, returning nil. 
+Very occasionally it generates a wrong rule - one which is not a correct translation of the rule
+semantics - but that is buggy behaviour, which I'll try to fix over the next few weeks, not a
+design fault.</p>
+
+<p>More significantly it does not generate useful error messages on failure. This is, I think, a much
+more complex issue which I don't yet know how to address.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-parser.core
   (:use mw-engine.utils
@@ -3054,62 +3062,198 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(declare parse-conditions)
 (declare parse-not-condition)
 (declare parse-simple-condition)</pre></td></tr><tr><td class="docs"><p>a regular expression which matches string representation of numbers</p>
-</td><td class="codes"><pre class="brush: clojure">(def re-number #&quot;^[0-9.]*$&quot;)</pre></td></tr><tr><td class="docs"><p>Parse '[property] is less than [value]'.</p>
+</td><td class="codes"><pre class="brush: clojure">(def re-number #&quot;^[0-9.]*$&quot;)</pre></td></tr><tr><td class="docs"><p>If this token appears to represent an explicit number, return that number;
+   otherwise, make a keyword of it and return that.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn keyword-or-numeric
+  [token]
+  (cond 
+    (re-matches re-number token) (read-string token)
+    (keyword? token) token
+    true (keyword token)))</pre></td></tr><tr><td class="docs"><p>Generally all functions in this file with names beginning 'parse-' take a 
+sequence of tokens (and in some cases other optional arguments) and return a
+vector comprising</p>
+
+<h1>A code fragment parsed from the front of the sequence of tokens, and</h1>
+
+<h1>the remaining tokens which were not consumed in constructing that sequence.</h1>
+
+<p>In every case if the function cannot parse the desired construct from the
+front of the sequence of tokens it returns nil.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Parse a number.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-numeric-value
+  [[value &amp; remainder]]
+  (if (re-matches re-number value) [(read-string value) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell, 
+  whose value is assumed to be an integer.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-property-int
+  [[value &amp; remainder]]
+  (if value [(list 'get-int 'cell (keyword value)) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-property-value
+  [[value &amp; remainder]]
+  (if value [(list (keyword value) 'cell) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a value from the first of these <code>tokens</code>. If <code>expect-int</code> is true, return
+   an integer or something which will evaluate to an integer.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-value
+  ([tokens expect-int]
+    (or
+        (parse-numeric-value tokens)
+        (cond expect-int
+          (parse-property-int tokens)
+          true (parse-property-value tokens))))
+  ([tokens]
+    (parse-simple-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parse a list of values from among these <code>tokens</code>. If <code>expect-int</code> is true, return
+   an integer or something which will evaluate to an integer.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-disjunct-value
+  [[OR token &amp; tokens] expect-int]
+  (cond (member? OR '(&quot;or&quot; &quot;in&quot;))
+    (let [[others remainder] (parse-disjunct-value tokens expect-int)]
+      [(cons 
+         (cond 
+           expect-int (first (parse-simple-value (list token) true))
+           true (keyword token)) 
+         others) 
+       remainder])
+    true [nil (cons OR (cons token tokens))]))</pre></td></tr><tr><td class="docs"><p>Parse a value from among these <code>tokens</code>. If <code>expect-int</code> is true, return
+   an integer or something which will evaluate to an integer.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-value 
+  ([tokens expect-int]
+    (or 
+      (parse-disjunct-value tokens expect-int)
+      (parse-simple-value tokens)))
+  ([tokens]
+    (parse-value tokens false)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-member-condition
+  [[property IN &amp; rest]]
+  (if (= IN &quot;in&quot;)
+    (let [[l remainder] (parse-disjunct-value (cons &quot;in&quot; rest) false)]
+      [(list 'member? (keyword property) l) remainder])))</pre></td></tr><tr><td class="docs"><p>Parse '[property] less than [value]'.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-less-condition
-  [[property is less than value &amp; rest]]
-  (cond (and (member? is '(&quot;is&quot; &quot;are&quot;)) (= less &quot;less&quot;) (= than &quot;than&quot;))
-        [(list '&lt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs"><p>Parse '[property] is more than [value]'.</p>
+  [[property LESS THAN value &amp; rest]]
+  (cond (and (= LESS &quot;less&quot;) (= THAN &quot;than&quot;))
+        [(list '&lt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs"><p>Parse '[property] more than [value]'.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-more-condition
-  [[property is more than value &amp; rest]]
-  (cond (and (member? is '(&quot;is&quot; &quot;are&quot;)) (= more &quot;more&quot;) (= than &quot;than&quot;))
-        [(list '&gt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs"><p>Parse clauses of the form 'x is y', but not 'x is more than y' or 'x is less than y'.
+  [[property MORE THAN value &amp; rest]]
+  (cond (and (= MORE &quot;more&quot;) (= THAN &quot;than&quot;))
+        [(list '&gt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-between-condition
+  [[p BETWEEN v1 AND v2 &amp; rest]]
+  (cond (and (= BETWEEN &quot;between&quot;) (= AND &quot;and&quot;) (not (nil? v2)))
+    (let [property (first (parse-simple-value (list p) true))
+          value1 (first (parse-simple-value (list v1) true))
+          value2 (first (parse-simple-value (list v2) true))]
+      [(list 'or
+            (list '&lt; value1 property value2)
+            (list '&gt; value1 property value2)) rest])))</pre></td></tr><tr><td class="docs"><p>Parse clauses of the form 'x is y', 'x is in y or z...', 
+   'x is between y and z', 'x is more than y' or 'x is less than y'.
    It is necessary to disambiguate whether value is a numeric or keyword.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-is-condition
-  [[property is value &amp; rest]]
-  (cond (and (member? is '(&quot;is&quot; &quot;are&quot;))
-             (not (member? value '(&quot;more&quot; &quot;less&quot; &quot;exactly&quot; &quot;not&quot;))))
-        [(cond
-          (re-matches re-number value)(list '= (list 'get-int 'cell (keyword property)) (read-string value))
-          true (list '= (list (keyword property) 'cell) (keyword value)))
-         rest]))</pre></td></tr><tr><td class="docs"><p>Parse the negation of a simple condition.</p>
+  [[property IS value &amp; rest]]
+  (cond 
+    (member? IS '(&quot;is&quot; &quot;are&quot;))
+    (let [tokens (cons property (cons value rest))]
+      (cond 
+        (= value &quot;in&quot;) (parse-member-condition tokens)
+        (= value &quot;between&quot;) (parse-between-condition tokens)
+        (= value &quot;more&quot;) (parse-more-condition tokens)
+        (= value &quot;less&quot;) (parse-less-condition tokens)
+        (re-matches re-number value) [(list '= (list 'get-int 'cell (keyword property)) (read-string value)) rest]
+        value [(list '= (list (keyword property) 'cell) (keyword value)) rest]))))</pre></td></tr><tr><td class="docs"><p>Parse the negation of a simple condition.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-not-condition 
-  [[property is not &amp; rest]]
-  (cond (and (member? is '(&quot;is&quot; &quot;are&quot;)) (= not &quot;not&quot;))
-        (let [partial (parse-simple-condition (cons property (cons is rest)))]
-          (cond partial
-                (let [[condition remainder] partial]
-                  [(list 'not condition) remainder])))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '[property] [comparison] [value]'.</p>
+  [[property IS NOT &amp; rest]]
+  (cond (and (member? IS '(&quot;is&quot; &quot;are&quot;)) (= NOT &quot;not&quot;))
+    (let [partial (parse-simple-condition (cons property (cons &quot;is&quot; rest)))]
+      (cond partial
+        (let [[condition remainder] partial]
+          [(list 'not condition) remainder])))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- gen-neighbours-condition
+  [comparator quantity property value remainder] 
+  [(list comparator  
+         (list 'count
+               (list 'get-neighbours-with-property-value 'world 'cell 
+                     (keyword property) (keyword-or-numeric value)))
+         quantity)
+           remainder])</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...more than 6 neighbours are [condition]'</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-comparator-neighbours-condition
+  [[MORE THAN n NEIGHBOURS have-or-are &amp; rest]]
+  (let [quantity (first (parse-numeric-value (list n)))
+        comparator (cond (= MORE &quot;more&quot;) '&gt;
+                     (member? MORE '(&quot;fewer&quot; &quot;less&quot;)) '&lt;)]       
+    (cond
+      (and quantity 
+           comparator
+           (= THAN &quot;than&quot;)
+           (= NEIGHBOURS &quot;neighbours&quot;))
+      (cond
+        (= have-or-are &quot;are&quot;) 
+        (let [[value &amp; remainder] rest]
+          (gen-neighbours-condition comparator quantity :state value remainder))
+        (= have-or-are &quot;have&quot;)
+        (let [[property comp1 comp2 value &amp; remainder] rest]
+          (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
+            (gen-neighbours-condition comparator quantity property value remainder)
+;;            (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
+;;            (gen-neighbours-condition '&gt; quantity property value remainder)
+;;            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
+;;            (gen-neighbours-condition '&lt; quantity property value remainder)))))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-some-neighbours-condition
+  [[SOME NEIGHBOURS &amp; rest]]
+  (cond
+    (and (= SOME &quot;some&quot;) (= NEIGHBOURS &quot;neighbours&quot;))
+    (parse-comparator-neighbours-condition (concat '(&quot;more&quot; &quot;than&quot; &quot;0&quot; &quot;neighbours&quot;) rest))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...6 neighbours are condition'</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-neighbours-condition
+  [[n NEIGHBOURS have-or-are &amp; rest]]
+  (let [quantity (first (parse-numeric-value (list n)))]       
+    (cond
+      (and quantity (= NEIGHBOURS &quot;neighbours&quot;))
+      (cond
+        (= have-or-are &quot;are&quot;) 
+        (let [[value &amp; remainder] rest]
+          (gen-neighbours-condition '= quantity :state value remainder))
+        (= have-or-are &quot;have&quot;)
+        (let [[property comp1 comp2 value &amp; remainder] rest]
+          (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
+            (gen-neighbours-condition '= quantity property value remainder)
+;;            (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
+;;            (gen-neighbours-condition '&gt; quantity property value remainder)
+;;            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
+;;            (gen-neighbours-condition '&lt; quantity property value remainder)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-neighbours-condition
+  [tokens]
+  (or
+    (parse-simple-neighbours-condition tokens)
+    (parse-comparator-neighbours-condition tokens)
+    (parse-some-neighbours-condition tokens)))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '[property] [comparison] [value]'.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-simple-condition
   [tokens]
-  (or (parse-is-condition tokens)
-      (parse-not-condition tokens)
-      (parse-less-condition tokens)
-      (parse-more-condition tokens)))</pre></td></tr><tr><td class="docs"><p>Parse '... or [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first disjunct.</p>
+  (or
+    (parse-neighbours-condition tokens)
+    (parse-member-condition tokens)
+    (parse-not-condition tokens)
+    (parse-is-condition tokens)
+    (parse-less-condition tokens)
+    (parse-more-condition tokens)))</pre></td></tr><tr><td class="docs"><p>Parse '... or [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first disjunct.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-disjunction-condition
   [left tokens]
   (let [partial (parse-conditions tokens)]
-    (if
-       partial
-           (let [[right remainder] partial]
-             [(list 'or left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse '... and [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first conjunct.</p>
+    (if partial
+      (let [[right remainder] partial]
+        [(list 'or left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse '... and [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first conjunct.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-conjunction-condition
   [left tokens]
   (let [partial (parse-conditions tokens)]
     (if partial
-           (let [[right remainder] partial]
-             [(list 'and left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse conditions from <code>tokens</code>, where conditions may be linked by either 'and' or 'or'.</p>
+      (let [[right remainder] partial]
+        [(list 'and left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse conditions from <code>tokens</code>, where conditions may be linked by either 'and' or 'or'.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-conditions
   [tokens]
   (let [partial (parse-simple-condition tokens)]
     (if partial
-           (let [[left [next &amp; remainder]] partial]
-             (cond
-              (= next &quot;and&quot;) (parse-conjunction-condition left remainder)
-              (= next &quot;or&quot;) (parse-disjunction-condition left remainder)
-              true partial)))))</pre></td></tr><tr><td class="docs"><p>Parse the left hand side ('if...') of a production rule.</p>
+      (let [[left [next &amp; remainder]] partial]
+        (cond
+          (= next &quot;and&quot;) (parse-conjunction-condition left remainder)
+          (= next &quot;or&quot;) (parse-disjunction-condition left remainder)
+          true partial)))))</pre></td></tr><tr><td class="docs"><p>Parse the left hand side ('if...') of a production rule.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-left-hand-side
-  [tokens]
-  (if
+ [tokens]
+ (if
    (= (first tokens) &quot;if&quot;)
    (parse-conditions (rest tokens))))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [property] [arithmetic-operator] [value]',
    e.g. 'fertility should be fertility + 1', or 'deer should be deer - wolves'.</p>
@@ -3121,27 +3265,41 @@ net.brehaut.ClojureTools = (function (SH) {
     [(list 'merge (or previous 'cell)
            {(keyword prop1) (list (symbol operator) (list 'get-int 'cell (keyword prop2))
                                   (cond
-                                     (re-matches re-number value) (read-string value)
-                                     true (list 'get-int 'cell (keyword value))))}) rest]))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [value].'</p>
+                                    (re-matches re-number value) (read-string value)
+                                    true (list 'get-int 'cell (keyword value))))}) rest]))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [value].'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-set-action 
   [previous [property should be value &amp; rest]]
   (if (and (= should &quot;should&quot;) (= be &quot;be&quot;))
     [(list 'merge (or previous 'cell)
            {(keyword property) (cond (re-matches re-number value) (read-string value) true (keyword value))}) rest]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn parse-simple-action [previous tokens]
-    (or (parse-arithmetic-action previous tokens)
-        (parse-set-action previous tokens)))</pre></td></tr><tr><td class="docs"><p>Parse actions from tokens.</p>
+  (or (parse-arithmetic-action previous tokens)
+      (parse-set-action previous tokens)))</pre></td></tr><tr><td class="docs"><p>Parse actions from tokens.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-actions
   [previous tokens]
   (let [[left remainder] (parse-simple-action previous tokens)]
     (cond left
           (cond (= (first remainder) &quot;and&quot;)
                 (parse-actions left (rest remainder))
-                true (list left)))))</pre></td></tr><tr><td class="docs"><p>Parse the right hand side ('then...') of a production rule.</p>
+                true (list left)))))</pre></td></tr><tr><td class="docs"><p>Parse a probability of an action from this collection of tokens</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-probability 
+  [previous [n CHANCE IN m &amp; tokens]]
+  (cond 
+    (and (= CHANCE &quot;chance&quot;)(= IN &quot;in&quot;))
+    (let [[action remainder] (parse-actions previous tokens)]
+      (cond action
+        [(list 'cond 
+              (list '&lt; 
+                    (list 'rand 
+                          (first (parse-simple-value (list m) true)))
+                    (first (parse-simple-value (list n) true))) 
+              action) remainder])))) </pre></td></tr><tr><td class="docs"><p>Parse the right hand side ('then...') of a production rule.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-right-hand-side
-  [tokens]
-  (if (= (first tokens) &quot;then&quot;)
-    (parse-actions nil (rest tokens))))</pre></td></tr><tr><td class="docs"><p>Parse a complete rule from this string or sequence of string tokens.</p>
+  [[THEN &amp; tokens]]
+  (if (= THEN &quot;then&quot;)
+    (or
+      (parse-probability nil tokens)
+      (parse-actions nil tokens))))</pre></td></tr><tr><td class="docs"><p>Parse a complete rule from this string or sequence of string tokens.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-rule 
   [line]
   (cond
@@ -3149,5 +3307,13 @@ net.brehaut.ClojureTools = (function (SH) {
    true (let [[left remainder] (parse-left-hand-side line)
               [right junk] (parse-right-hand-side remainder)]
           ;; there shouldn't be any junk (should be null)
-          (list 'fn ['cell 'world] (list 'if left right)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+          (list 'fn ['cell 'world] (list 'if left right)))))</pre></td></tr><tr><td class="docs"><p>Parse this <code>rule-text</code>, a string conforming to the grammar of MicroWorld rules,
+   into Clojure source, and then compile it into an anonymous
+   function object, getting round the problem of binding mw-engine.utils in
+   the compiling environment.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn compile-rule 
+  [rule-text]
+  (do
+    (use 'mw-engine.utils)
+    (eval (parse-rule rule-text))))  </pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

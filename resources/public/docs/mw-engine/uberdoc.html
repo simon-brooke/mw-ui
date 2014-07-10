@@ -3038,6 +3038,10 @@ net.brehaut.ClojureTools = (function (SH) {
 fires, it returns a new cell, which should have the same values for :x and
 :y as the old cell. Anything else can be modified.</p>
 
+<p>While any function of two arguments can be used as a rule, a special high
+level rule language is provided by the <code>mw-parser</code> package, which compiles
+rules expressed in a subset of English rules into suitable functions.</p>
+
 <p>A cell is a map containing at least values for the keys :x, :y, and :state;
 a transformation should not alter the values of :x or :y, and should not
 return a cell without a keyword as the value of :state. Anything else is
@@ -3047,7 +3051,9 @@ legal.</p>
 that every cell's :x and :y properties reflect its place in the matrix.
 See <code>world.clj</code>.</p>
 
-<p>Rules are applied in turn until one matches.</p>
+<p>Each time the world is transformed (see <code>transform-world</code>, for each cell, 
+rules are applied in turn until one matches. Once one rule has matched no
+further rules can be applied.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-cell
   [cell world rules]
@@ -3080,21 +3086,7 @@ See <code>world.clj</code>.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn run-world
   [world init-rules rules generations]
   (let [state {:world (transform-world world init-rules) :rules rules}]
-    (take generations (iterate transform-world-state state))))</pre></td></tr><tr><td class="docs"><p>(defn animate-world
-  "Run this world with these rules for this number of generations, and return nil
-  to avoid cluttering the screen. Principally for debugging.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><ul>
-<li><code>world</code> a world as discussed above;</li>
-<li><code>init-rules</code> a sequence of rules as defined above, to be run once to initialise the world;</li>
-<li><code>rules</code> a sequence of rules as definied above, to be run iteratively for each generation;</li>
-<li><code>generations</code> an (integer) number of generations."
-[world init-rules rules generations]
-(let [state (list (transform-world world init-rules) rules)]
-(dorun
-  (take generations (iterate transform-world-state state)))
-state))</li>
-</ul>
-</td><td class="codes"></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.heightmap" name="mw-engine.heightmap"><h1 class="project-name">mw-engine.heightmap</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to apply a heightmap to a world.</p>
+    (take generations (iterate transform-world-state state))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.heightmap" name="mw-engine.heightmap"><h1 class="project-name">mw-engine.heightmap</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to apply a heightmap to a world.</p>
 
 <p>Heightmaps are considered only as greyscale images, so colour is redundent (will be
 ignored). Darker shades are higher.</p>
@@ -3109,7 +3101,7 @@ ignored). Darker shades are higher.</p>
         [fivetonine.collage.util]))</pre></td></tr><tr><td class="docs"><p>Surprisingly, Clojure doesn't seem to have an abs function, or else I've 
    missed it. So here's one of my own. Maps natural numbers onto themselves,
    and negative integers onto natural numbers. Also maps negative real numbers
-   onto positive real numbers, but I don't care so much about them.</p>
+   onto positive real numbers.</p>
 
 <ul>
 <li><code>n</code> a number, on the set of real numbers.</li>
@@ -3117,8 +3109,7 @@ ignored). Darker shades are higher.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- abs 
   [n]
   (cond (&lt; n 0) (- 0 n) true n))</pre></td></tr><tr><td class="docs"><p>Set the altitude of this cell from the corresponding pixel of this heightmap.
-   If the heightmap you supply is smaller than the world, this will break and 
-   it's ALL YOUR FAULT.</p>
+   If the heightmap you supply is smaller than the world, this will break.</p>
 
 <ul>
 <li><code>cell</code> a cell, as discussed in world.clj, q.v. Alternatively, a map;</li>
@@ -3137,8 +3128,7 @@ ignored). Darker shades are higher.</p>
                          (get-int cell :x)
                          (get-int cell :y)) 256))))}))</pre></td></tr><tr><td class="docs"><p>Set the altitude of each cell in this sequence from the corresponding pixel 
    of this heightmap.
-   If the heightmap you supply is smaller than the world, this will break and 
-   it's ALL YOUR FAULT.</p>
+   If the heightmap you supply is smaller than the world, this will break.</p>
 
 <ul>
 <li><code>row</code> a row in a world, as discussed in world.clj, q.v. Alternatively, a
@@ -3148,7 +3138,7 @@ ignored). Darker shades are higher.</p>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn- apply-heightmap-row
   [row heightmap]
-  (apply vector (map #(transform-altitude %1 heightmap) row)))</pre></td></tr><tr><td class="docs"><p>Apply the image file loaded from this path to this world, and return a world whose
+  (apply vector (map #(transform-altitude % heightmap) row)))</pre></td></tr><tr><td class="docs"><p>Apply the image file loaded from this path to this world, and return a world whose
   altitudes are modified (added to) by the altitudes in the heightmap. It is assumed that
   the heightmap is at least as large in x and y dimensions as the world.</p>
 
@@ -3160,7 +3150,7 @@ ignored). Darker shades are higher.</p>
   [world imagepath]
   ;; bizarrely, the collage load-util is working for me, but the imagez version isn't.
   (let [heightmap (filter-image (grayscale)(load-image imagepath))]
-    (apply vector (map #(apply-heightmap-row %1 heightmap) world))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
+    (apply vector (map #(apply-heightmap-row % heightmap) world))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.natural-rules
   (:use mw-engine.utils
@@ -3343,33 +3333,52 @@ ignored). Darker shades are higher.</p>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn population
   [cell species]
-  (get-int cell species))</pre></td></tr><tr><td class="docs">
+  (get-int cell species))</pre></td></tr><tr><td class="docs"><p>Get the neighbours to distance depth of the cell at x, y in this world.</p>
+
+<pre><code>* `world` a world, as described in world.clj;
+* `x` an integer representing an x coordinate in that world;
+* `y` an integer representing an y coordinate in that world;
+* `depth` an integer representing the distance from [x,y] that
+  should be searched.
+</code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defn get-neighbours
-  ([world x y depth]
-    &quot;Get the neighbours to distance depth of the cell at x, y in this world.
-    * `world` a world, as described in world.clj;
-    * `x` an integer representing an x coordinate in that world;
-    * `y` an integer representing an y coordinate in that world;
-    * `depth` an integer representing the distance from [x,y] that
-      should be searched.&quot;
-     (remove nil?
-            (map #(get-cell world (first %) (first (rest %)))
-               (remove #(= % (list x y))
-                 (combo/cartesian-product
-                   (range (- x depth) (+ x depth 1))
-                   (range (- y depth) (+ y depth 1)))))))
-   ([world cell depth] 
-    &quot;Get the neighbours to distance depth of this cell in this world.
-    * `world` a world, as described in world.clj;
-    * `cell` a cell within that world;
-    * `depth` an integer representing the distance from [x,y] that
-      should be searched.&quot;
-    (get-neighbours world (:x cell) (:y cell) depth))
-   ([world cell]
-    &quot;Get the immediate neighbours of this cell in this world
-    * `world` a world, as described in world.clj;
-    * `cell` a cell within that world.&quot;
-    (get-neighbours world cell 1)))</pre></td></tr><tr><td class="docs"><p>Get the neighbours to distance depth of the cell at x, y in this world which
+    ([world x y depth]
+      (remove nil?
+              (map #(get-cell world (first %) (first (rest %)))
+                   (remove #(= % (list x y))
+                           (combo/cartesian-product
+                             (range (- x depth) (+ x depth 1))
+                             (range (- y depth) (+ y depth 1)))))))
+    ([world cell depth] 
+      &quot;Get the neighbours to distance depth of this cell in this world.
+      * `world` a world, as described in world.clj;
+      * `cell` a cell within that world;
+      * `depth` an integer representing the distance from [x,y] that
+        should be searched.&quot;
+      (get-neighbours world (:x cell) (:y cell) depth))
+    ([world cell]
+      &quot;Get the immediate neighbours of this cell in this world
+      * `world` a world, as described in world.clj;
+      * `cell` a cell within that world.&quot;
+      (get-neighbours world cell 1)))</pre></td></tr><tr><td class="docs"><p>Get the neighbours to distance depth of the cell at x, y in this world which
+   have this value for this property.</p>
+
+<pre><code>* `world` a world, as described in `world.clj`;
+* `cell` a cell within that world;
+* `depth` an integer representing the distance from [x,y] that
+  should be searched;
+* `property` a keyword representing a property of the neighbours.
+* `value` a value of that property
+</code></pre>
+</td><td class="codes"><pre class="brush: clojure">(defn get-neighbours-with-property-value
+  ([world x y depth property value]
+    (filter #(= (get % property) value) (get-neighbours world x y depth)))
+  ([world cell depth property value]
+    (get-neighbours-with-property-value world (:x cell) (:y cell) depth 
+                                        property value))
+  ([world cell property value]
+    (get-neighbours-with-property-value world cell 1 
+                                        property value)))</pre></td></tr><tr><td class="docs"><p>Get the neighbours to distance depth of the cell at x, y in this world which
    have this state.</p>
 
 <pre><code>* `world` a world, as described in `world.clj`;
@@ -3379,8 +3388,12 @@ ignored). Darker shades are higher.</p>
 * `state` a keyword representing a state in the world.
 </code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defn get-neighbours-with-state
-  [world x y depth state]
-  (filter #(= (:state %) state) (get-neighbours world x y depth)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.world" name="mw-engine.world"><h1 class="project-name">mw-engine.world</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to create and to print two dimensional cellular automata. Nothing in this
+  ([world x y depth state]
+    (filter #(= (:state %) state) (get-neighbours world x y depth)))
+  ([world cell depth state]
+    (get-neighbours-with-state world (:x cell) (:y cell) depth state))
+  ([world cell state]
+    (get-neighbours-with-state world cell 1 state)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.world" name="mw-engine.world"><h1 class="project-name">mw-engine.world</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to create and to print two dimensional cellular automata. Nothing in this
 file should determine what states are possible within the automaton, except for the
 initial state, :new.</p>
 

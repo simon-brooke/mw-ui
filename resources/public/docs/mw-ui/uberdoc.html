@@ -3133,12 +3133,14 @@ net.brehaut.ClojureTools = (function (SH) {
    world, into a path which should recover the corresponding image file.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn format-image-path
   [statekey]
-  (format &quot;img/tiles/%s.png&quot; (format-css-class statekey)))</pre></td></tr><tr><td class="docs"><p>Render this world cell as a Hiccup table cell.</p>
+  (format &quot;img/tiles/%s.png&quot; (format-css-class statekey)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn format-mouseover [cell]
+  (str &quot;State &quot; (:state cell) &quot;; altitude: &quot; (:altitude cell) &quot;; fertility: &quot; (:fertility cell)))</pre></td></tr><tr><td class="docs"><p>Render this world cell as a Hiccup table cell.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-cell
   [cell]
   (let [state (:state cell)]
-    [:td {:class (format-css-class state)}
-            [:img {:alt (world/format-cell cell) :img (format-image-path state)}]]))</pre></td></tr><tr><td class="docs"><p>Render this world row as a Hiccup table row.</p>
+    [:td {:class (format-css-class state) :title (format-mouseover cell)}
+            [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]))</pre></td></tr><tr><td class="docs"><p>Render this world row as a Hiccup table row.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-row
   [row]
   (apply vector (cons :tr (map render-cell row))))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the session as a complete HTML page.</p>
@@ -3152,14 +3154,15 @@ net.brehaut.ClojureTools = (function (SH) {
                    rules/init-rules))
         rules (or (session/get :rules) rules/natural-rules)
         generation (+ (or (session/get :generation) 0) 1)
-        w2 (engine/transform-world world rules)]
+        w2 (engine/transform-world world rules)
+        ]
     (session/put! :world w2)
     (session/put! :generation generation)
     [:div {:class &quot;world&quot;}
-     [:p (str &quot;Generation &quot; generation)]
       (apply vector
                  (cons :table
-                       (map render-world-row w2)))]))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the session as a complete HTML page.</p>
+                       (map render-world-row w2)))
+      [:p (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the session as a complete HTML page.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world
   []
   (html
@@ -3173,7 +3176,6 @@ net.brehaut.ClojureTools = (function (SH) {
      [:link {:href &quot;css/states.css&quot; :type &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
      [:meta {:http-equiv &quot;refresh&quot; :content &quot;5&quot;}]]
     [:body
-     [:h1 &quot;MicroWorld&quot;]
      (render-world-table)
      ]]))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.repl" name="mw-ui.repl"><h1 class="project-name">mw-ui.repl</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.repl
@@ -3213,16 +3215,26 @@ net.brehaut.ClojureTools = (function (SH) {
             [mw-ui.render-world :as world]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn home-page []
-  (layout/render
-    &quot;home.html&quot; {:title &quot;Welcome to MicroWorld&quot; :content (util/md-&gt;html &quot;/md/docs.md&quot;)}))</pre></td></tr><tr><td class="docs">
+  (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; 
+                               :content (html (world/render-world-table)) 
+                               :seconds (or (session/get :seconds) 5) 
+                               :maybe-refresh &quot;refresh&quot;}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn about-page []
   (layout/render &quot;about.html&quot; {:title &quot;About MicroWorld&quot; :content (util/md-&gt;html &quot;/md/about.md&quot;)}))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn world-page []
-  (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; :content (html (world/render-world-table)) :seconds (or (session/get :seconds) 5) :maybe-refresh &quot;refresh&quot;}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn list-states []
+  (sort
+    (filter #(not (nil? %)) 
+            (map #(first (rest (re-matches #&quot;([0-9a-z-]+).png&quot; (.getName %))))
+                 (file-seq (clojure.java.io/file &quot;resources/public/img/tiles&quot;))))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn docs-page []
+  (layout/render &quot;docs.html&quot; {:title &quot;Documentation&quot;
+                              :parser (util/md-&gt;html &quot;/md/parser.md&quot;)
+                              :states (list-states)
+                              :components [&quot;mw-engine&quot; &quot;mw-parser&quot; &quot;mw-ui&quot;]}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defroutes home-routes
   (GET &quot;/&quot; [] (home-page))
   (GET &quot;/about&quot; [] (about-page))
-  (GET &quot;/world&quot; [] (world-page)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (GET &quot;/docs&quot;  [] (docs-page)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.util
   (:require [noir.io :as io]
             [markdown.core :as md]))</pre></td></tr><tr><td class="docs"><p>reads a markdown file from public/md and returns an HTML string</p>
