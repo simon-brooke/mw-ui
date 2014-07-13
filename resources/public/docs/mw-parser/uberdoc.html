@@ -3029,7 +3029,35 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>mw-parser -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">mw-parser</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Parser for production rules for MicroWorld engine</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-parser.core">mw-parser.core</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.core" name="mw-parser.core"><h1 class="project-name">mw-parser.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A very simple parser which parses production rules of the following forms:</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-parser.bulk">mw-parser.bulk</a></li><li><a href="#mw-parser.core">mw-parser.core</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.bulk" name="mw-parser.bulk"><h1 class="project-name">mw-parser.bulk</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>parse multiple rules from a stream, possibly a file - although the real
+objective is to parse rules out of a block of text from a textarea</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns mw-parser.bulk
+  (:use mw-parser.core
+        mw-engine.utils
+        clojure.java.io)
+  (:import (java.io BufferedReader StringReader)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn parse-line [line]
+  (let [initial (first line)]
+    (cond
+      (member? initial '(nil \# \;)) nil
+      true (parse-rule line))))</pre></td></tr><tr><td class="docs"><p>Parse rules from lines returned by this <code>reader</code>. Ignore
+   lines starting with <code>;;</code>, but otherwise throw an exception if any
+   line cannot be parsed.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-from-reader 
+  [reader]
+  (remove nil?
+          (map parse-line
+               (line-seq reader))))</pre></td></tr><tr><td class="docs"><p>Parse rules from successive lines in the file loaded from this <code>filename</code></p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-file 
+  [filename]
+  (with-open [rdr (reader filename)]
+    (remove nil?
+          (map parse-line 
+               (line-seq rdr)))))</pre></td></tr><tr><td class="docs"><p>Parse rules from successive lines in this <code>string</code></p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-string
+   [string]
+   (parse-from-reader (BufferedReader. (StringReader. string))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.core" name="mw-parser.core"><h1 class="project-name">mw-parser.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A very simple parser which parses production rules of the following forms:</p>
 
 <ul>
 <li>"if altitude is less than 100 and state is forest then state should be climax and deer should be 3"</li>
@@ -3058,13 +3086,13 @@ more complex issue which I don't yet know how to address.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-parser.core
   (:use mw-engine.utils
-        [clojure.string :only [split triml]]))</pre></td></tr><tr><td class="docs">
+        [clojure.string :only [split trim triml]]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(declare parse-conditions)
 (declare parse-not-condition)
 (declare parse-simple-condition)</pre></td></tr><tr><td class="docs"><p>a regular expression which matches string representation of numbers</p>
 </td><td class="codes"><pre class="brush: clojure">(def re-number #&quot;^[0-9.]*$&quot;)</pre></td></tr><tr><td class="docs"><p>If this token appears to represent an explicit number, return that number;
    otherwise, make a keyword of it and return that.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn keyword-or-numeric
+</td><td class="codes"><pre class="brush: clojure">(defn- keyword-or-numeric
   [token]
   (cond 
     (re-matches re-number token) (read-string token)
@@ -3080,18 +3108,18 @@ vector comprising</p>
 <p>In every case if the function cannot parse the desired construct from the
 front of the sequence of tokens it returns nil.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Parse a number.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-numeric-value
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-numeric-value
   [[value &amp; remainder]]
   (if (re-matches re-number value) [(read-string value) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell, 
   whose value is assumed to be an integer.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-property-int
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-property-int
   [[value &amp; remainder]]
   (if value [(list 'get-int 'cell (keyword value)) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-property-value
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-property-value
   [[value &amp; remainder]]
   (if value [(list (keyword value) 'cell) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a value from the first of these <code>tokens</code>. If <code>expect-int</code> is true, return
    an integer or something which will evaluate to an integer.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-value
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-simple-value
   ([tokens expect-int]
     (or
         (parse-numeric-value tokens)
@@ -3101,7 +3129,7 @@ front of the sequence of tokens it returns nil.</p>
   ([tokens]
     (parse-simple-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parse a list of values from among these <code>tokens</code>. If <code>expect-int</code> is true, return
    an integer or something which will evaluate to an integer.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-disjunct-value
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-disjunct-value
   [[OR token &amp; tokens] expect-int]
   (cond (member? OR '(&quot;or&quot; &quot;in&quot;))
     (let [[others remainder] (parse-disjunct-value tokens expect-int)]
@@ -3113,27 +3141,27 @@ front of the sequence of tokens it returns nil.</p>
        remainder])
     true [nil (cons OR (cons token tokens))]))</pre></td></tr><tr><td class="docs"><p>Parse a value from among these <code>tokens</code>. If <code>expect-int</code> is true, return
    an integer or something which will evaluate to an integer.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-value 
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-value 
   ([tokens expect-int]
     (or 
       (parse-disjunct-value tokens expect-int)
       (parse-simple-value tokens)))
   ([tokens]
-    (parse-value tokens false)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn parse-member-condition
+    (parse-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parses a condition of the form '[property] in [value] or [value]...'</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-member-condition
   [[property IN &amp; rest]]
   (if (= IN &quot;in&quot;)
     (let [[l remainder] (parse-disjunct-value (cons &quot;in&quot; rest) false)]
       [(list 'member? (keyword property) l) remainder])))</pre></td></tr><tr><td class="docs"><p>Parse '[property] less than [value]'.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-less-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-less-condition
   [[property LESS THAN value &amp; rest]]
   (cond (and (= LESS &quot;less&quot;) (= THAN &quot;than&quot;))
         [(list '&lt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs"><p>Parse '[property] more than [value]'.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-more-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-more-condition
   [[property MORE THAN value &amp; rest]]
   (cond (and (= MORE &quot;more&quot;) (= THAN &quot;than&quot;))
         [(list '&gt; (list 'get-int 'cell (keyword property)) (read-string value)) rest]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn parse-between-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-between-condition
   [[p BETWEEN v1 AND v2 &amp; rest]]
   (cond (and (= BETWEEN &quot;between&quot;) (= AND &quot;and&quot;) (not (nil? v2)))
     (let [property (first (parse-simple-value (list p) true))
@@ -3144,7 +3172,7 @@ front of the sequence of tokens it returns nil.</p>
             (list '&gt; value1 property value2)) rest])))</pre></td></tr><tr><td class="docs"><p>Parse clauses of the form 'x is y', 'x is in y or z...', 
    'x is between y and z', 'x is more than y' or 'x is less than y'.
    It is necessary to disambiguate whether value is a numeric or keyword.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-is-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-is-condition
   [[property IS value &amp; rest]]
   (cond 
     (member? IS '(&quot;is&quot; &quot;are&quot;))
@@ -3156,7 +3184,7 @@ front of the sequence of tokens it returns nil.</p>
         (= value &quot;less&quot;) (parse-less-condition tokens)
         (re-matches re-number value) [(list '= (list 'get-int 'cell (keyword property)) (read-string value)) rest]
         value [(list '= (list (keyword property) 'cell) (keyword value)) rest]))))</pre></td></tr><tr><td class="docs"><p>Parse the negation of a simple condition.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-not-condition 
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-not-condition 
   [[property IS NOT &amp; rest]]
   (cond (and (member? IS '(&quot;is&quot; &quot;are&quot;)) (= NOT &quot;not&quot;))
     (let [partial (parse-simple-condition (cons property (cons &quot;is&quot; rest)))]
@@ -3171,7 +3199,7 @@ front of the sequence of tokens it returns nil.</p>
                      (keyword property) (keyword-or-numeric value)))
          quantity)
            remainder])</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...more than 6 neighbours are [condition]'</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-comparator-neighbours-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-comparator-neighbours-condition
   [[MORE THAN n NEIGHBOURS have-or-are &amp; rest]]
   (let [quantity (first (parse-numeric-value (list n)))
         comparator (cond (= MORE &quot;more&quot;) '&gt;
@@ -3193,12 +3221,12 @@ front of the sequence of tokens it returns nil.</p>
 ;;            (gen-neighbours-condition '&gt; quantity property value remainder)
 ;;            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
 ;;            (gen-neighbours-condition '&lt; quantity property value remainder)))))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn parse-some-neighbours-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-some-neighbours-condition
   [[SOME NEIGHBOURS &amp; rest]]
   (cond
     (and (= SOME &quot;some&quot;) (= NEIGHBOURS &quot;neighbours&quot;))
     (parse-comparator-neighbours-condition (concat '(&quot;more&quot; &quot;than&quot; &quot;0&quot; &quot;neighbours&quot;) rest))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...6 neighbours are condition'</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-neighbours-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-simple-neighbours-condition
   [[n NEIGHBOURS have-or-are &amp; rest]]
   (let [quantity (first (parse-numeric-value (list n)))]       
     (cond
@@ -3215,13 +3243,13 @@ front of the sequence of tokens it returns nil.</p>
 ;;            (gen-neighbours-condition '&gt; quantity property value remainder)
 ;;            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
 ;;            (gen-neighbours-condition '&lt; quantity property value remainder)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-neighbours-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-neighbours-condition
   [tokens]
   (or
     (parse-simple-neighbours-condition tokens)
     (parse-comparator-neighbours-condition tokens)
     (parse-some-neighbours-condition tokens)))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '[property] [comparison] [value]'.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-simple-condition
   [tokens]
   (or
     (parse-neighbours-condition tokens)
@@ -3230,19 +3258,19 @@ front of the sequence of tokens it returns nil.</p>
     (parse-is-condition tokens)
     (parse-less-condition tokens)
     (parse-more-condition tokens)))</pre></td></tr><tr><td class="docs"><p>Parse '... or [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first disjunct.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-disjunction-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-disjunction-condition
   [left tokens]
   (let [partial (parse-conditions tokens)]
     (if partial
       (let [[right remainder] partial]
         [(list 'or left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse '... and [condition]' from <code>tokens</code>, where <code>left</code> is the already parsed first conjunct.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-conjunction-condition
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-conjunction-condition
   [left tokens]
   (let [partial (parse-conditions tokens)]
     (if partial
       (let [[right remainder] partial]
         [(list 'and left right) remainder]))))</pre></td></tr><tr><td class="docs"><p>Parse conditions from <code>tokens</code>, where conditions may be linked by either 'and' or 'or'.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-conditions
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-conditions
   [tokens]
   (let [partial (parse-simple-condition tokens)]
     (if partial
@@ -3251,13 +3279,13 @@ front of the sequence of tokens it returns nil.</p>
           (= next &quot;and&quot;) (parse-conjunction-condition left remainder)
           (= next &quot;or&quot;) (parse-disjunction-condition left remainder)
           true partial)))))</pre></td></tr><tr><td class="docs"><p>Parse the left hand side ('if...') of a production rule.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-left-hand-side
- [tokens]
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-left-hand-side
+ [[IF &amp; tokens]]
  (if
-   (= (first tokens) &quot;if&quot;)
-   (parse-conditions (rest tokens))))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [property] [arithmetic-operator] [value]',
+   (= IF &quot;if&quot;)
+   (parse-conditions tokens)))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [property] [arithmetic-operator] [value]',
    e.g. 'fertility should be fertility + 1', or 'deer should be deer - wolves'.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-arithmetic-action 
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-arithmetic-action 
   [previous [prop1 should be prop2 operator value &amp; rest]]
   (if (and (= should &quot;should&quot;)
            (= be &quot;be&quot;)
@@ -3267,22 +3295,22 @@ front of the sequence of tokens it returns nil.</p>
                                   (cond
                                     (re-matches re-number value) (read-string value)
                                     true (list 'get-int 'cell (keyword value))))}) rest]))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [value].'</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-set-action 
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-set-action 
   [previous [property should be value &amp; rest]]
   (if (and (= should &quot;should&quot;) (= be &quot;be&quot;))
     [(list 'merge (or previous 'cell)
            {(keyword property) (cond (re-matches re-number value) (read-string value) true (keyword value))}) rest]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn parse-simple-action [previous tokens]
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-simple-action [previous tokens]
   (or (parse-arithmetic-action previous tokens)
       (parse-set-action previous tokens)))</pre></td></tr><tr><td class="docs"><p>Parse actions from tokens.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-actions
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-actions
   [previous tokens]
   (let [[left remainder] (parse-simple-action previous tokens)]
     (cond left
           (cond (= (first remainder) &quot;and&quot;)
                 (parse-actions left (rest remainder))
                 true (list left)))))</pre></td></tr><tr><td class="docs"><p>Parse a probability of an action from this collection of tokens</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-probability 
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-probability 
   [previous [n CHANCE IN m &amp; tokens]]
   (cond 
     (and (= CHANCE &quot;chance&quot;)(= IN &quot;in&quot;))
@@ -3294,7 +3322,7 @@ front of the sequence of tokens it returns nil.</p>
                           (first (parse-simple-value (list m) true)))
                     (first (parse-simple-value (list n) true))) 
               action) remainder])))) </pre></td></tr><tr><td class="docs"><p>Parse the right hand side ('then...') of a production rule.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn parse-right-hand-side
+</td><td class="codes"><pre class="brush: clojure">(defn- parse-right-hand-side
   [[THEN &amp; tokens]]
   (if (= THEN &quot;then&quot;)
     (or
