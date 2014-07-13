@@ -1,0 +1,14 @@
+{% extends "templates/base.html" %}
+{% block content %}
+<form action="{{servlet-context}}/rules" method="POST">
+	<textarea name="src" id="src" rows="10" cols="80">
+{{rule-text}}
+	</textarea>
+	<p class="widget">
+		<label for="submit">When you have finished editing</label>
+        <input name="submit" id="submit" type="submit" value="Save your rules"/>
+	</p>
+
+</form>
+
+{% endblock %}

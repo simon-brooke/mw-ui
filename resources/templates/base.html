@@ -23,6 +23,8 @@
         <div id="nav">
           <ul class="nav">
             <li class="{{home-selected}}"><a href="{{servlet-context}}/">Home</a></li>
+            <li class="{{rules-selected}}"><a href="{{servlet-context}}/rules">Rules</a></li>
+            <li class="{{world-selected}}"><a href="{{servlet-context}}/world">World</a></li>
             <li class="{{about-selected}}"><a href="{{servlet-context}}/about">About</a></li>
             <li class="{{docs-selected}}"><a href="{{servlet-context}}/docs">Documentation</a></li>
           </ul>
@@ -31,6 +33,12 @@
       </div>
 
     <div id="main-container" class="container">
+	  {% if error %}
+		<div id="announcement">
+			<p class="error">{{error}}</p>
+		</div>
+	  {% endif %}
+
       {% block content %}
       {% endblock %}
     </div>

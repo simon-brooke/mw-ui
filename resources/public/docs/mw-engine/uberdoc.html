@@ -3055,12 +3055,18 @@ See <code>world.clj</code>.</p>
 rules are applied in turn until one matches. Once one rule has matched no
 further rules can be applied.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- transform-cell
+</td><td class="codes"><pre class="brush: clojure">(defn- apply-rules
   [cell world rules]
   (cond (empty? rules) cell
     true (let [result (apply (eval (first rules)) (list cell world))]
            (cond result result
-             true (transform-cell cell world (rest rules))))))</pre></td></tr><tr><td class="docs"><p>Return a row derived from this row of this world by applying these rules to each cell.</p>
+             true (apply-rules cell world (rest rules))))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules. If an
+   exception is thrown, cache its message on the cell and set state to error</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- transform-cell
+  [cell world rules]
+  (try
+    (apply-rules cell world rules)
+    (catch Exception e (merge {:state :error :error (.getMessage e)} cell)))) </pre></td></tr><tr><td class="docs"><p>Return a row derived from this row of this world by applying these rules to each cell.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-world-row
   [row world rules]
   (map #(transform-cell % world rules) row))</pre></td></tr><tr><td class="docs"><p>Return a world derived from this world by applying these rules to each cell.</p>

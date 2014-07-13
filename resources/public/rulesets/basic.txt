@@ -1,0 +1,1 @@
+/home/simon/workspace/MicroWorld/mw-parser/resources/rules.txt

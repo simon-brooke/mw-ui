@@ -3053,7 +3053,7 @@ objective is to parse rules out of a block of text from a textarea</p>
    function, and return the sequence of such functions.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn compile-string
   [string]
-  (map compile-rule (split string #&quot;\n&quot;)))</pre></td></tr><tr><td class="docs"><p>Compile each non-comment line of the file indicated by this <code>filename</code> into 
+  (map compile-rule (remove comment? (split string #&quot;\n&quot;))))</pre></td></tr><tr><td class="docs"><p>Compile each non-comment line of the file indicated by this <code>filename</code> into 
    an executable anonymous function, and return the sequence of such functions.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn compile-file 
   [filename]
@@ -3224,16 +3224,16 @@ front of the sequence of tokens it returns nil.</p>
         (= have-or-are &quot;have&quot;)
         (let [[property comp1 comp2 value &amp; remainder] rest]
           (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
-            (gen-neighbours-condition comparator quantity property value remainder =)
+            (gen-neighbours-condition comparator quantity property value remainder '=)
             (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '&gt; quantity property value remainder &gt;)
+            (gen-neighbours-condition '&gt; quantity property value remainder '&gt;)
             (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '&lt; quantity property value remainder &lt;)))))))</pre></td></tr><tr><td class="docs">
+            (gen-neighbours-condition '&lt; quantity property value remainder '&lt;)))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn parse-some-neighbours-condition
   [[SOME NEIGHBOURS &amp; rest]]
   (cond
     (and (= SOME &quot;some&quot;) (= NEIGHBOURS &quot;neighbours&quot;))
-    (parse-comparator-neighbours-condition (concat '(&quot;more&quot; &quot;than&quot; &quot;0&quot; &quot;neighbours&quot;) rest))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...6 neighbours are condition'</p>
+    (parse-comparator-neighbours-condition (concat '(&quot;more&quot; &quot;than&quot; &quot;0&quot; &quot;neighbours&quot;) rest))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...6 neighbours are [condition]'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-simple-neighbours-condition
   [[n NEIGHBOURS have-or-are &amp; rest]]
   (let [quantity (first (parse-numeric-value (list n)))]       
@@ -3247,10 +3247,10 @@ front of the sequence of tokens it returns nil.</p>
         (let [[property comp1 comp2 value &amp; remainder] rest]
           (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
             (gen-neighbours-condition '= quantity property value remainder)
-;;            (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
-;;            (gen-neighbours-condition '&gt; quantity property value remainder)
-;;            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
-;;            (gen-neighbours-condition '&lt; quantity property value remainder)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
+            (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
+            (gen-neighbours-condition '&gt; quantity property value remainder '&gt;)
+            (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
+            (gen-neighbours-condition '&lt; quantity property value remainder '&lt;)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-neighbours-condition
   [tokens]
   (or

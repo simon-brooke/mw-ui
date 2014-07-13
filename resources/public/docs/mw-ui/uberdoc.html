@@ -3210,11 +3210,17 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.routes.home
   (:use compojure.core)
   (:require [hiccup.core :refer [html]]
+            [mw-parser.bulk :as compiler]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn home-page []
+  (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; 
+                               :content (html (world/render-world-table)) 
+                               :seconds (or (session/get :seconds) 5) 
+                               :maybe-refresh &quot;refresh&quot;}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn world-page []
   (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; 
                                :content (html (world/render-world-table)) 
                                :seconds (or (session/get :seconds) 5) 
@@ -3231,10 +3237,29 @@ net.brehaut.ClojureTools = (function (SH) {
                               :parser (util/md-&gt;html &quot;/md/mw-parser.md&quot;)
                               :states (list-states)
                               :components [&quot;mw-engine&quot; &quot;mw-parser&quot; &quot;mw-ui&quot;]}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn rules-page 
+  ([request]
+    (let [rule-text (:src request)
+          error 
+          (try 
+            (do
+              (if rule-text
+                (session/put! :rules (compiler/compile-string rule-text)))
+              (session/put! :rule-text rule-text)
+              nil)
+            (catch Exception e (.getMessage e)))]
+      (layout/render &quot;rules.html&quot; {:title &quot;Edit Rules&quot; 
+                                   :rule-text (or (session/get :rule-text) (slurp &quot;resources/public/rulesets/basic.txt&quot;))
+                                   :error error})))
+  ([]
+    (rules-page nil)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defroutes home-routes
   (GET &quot;/&quot; [] (home-page))
   (GET &quot;/about&quot; [] (about-page))
-  (GET &quot;/docs&quot;  [] (docs-page)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (GET &quot;/docs&quot;  [] (docs-page))
+  (GET &quot;/world&quot;  [] (world-page))
+  (GET &quot;/rules&quot; request (rules-page request))
+  (POST &quot;/rules&quot; request (rules-page request)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.util
   (:require [noir.io :as io]
             [markdown.core :as md]))</pre></td></tr><tr><td class="docs"><p>reads a markdown file from public/md and returns an HTML string</p>
