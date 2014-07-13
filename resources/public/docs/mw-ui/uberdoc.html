@@ -3228,7 +3228,7 @@ net.brehaut.ClojureTools = (function (SH) {
                  (file-seq (clojure.java.io/file &quot;resources/public/img/tiles&quot;))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn docs-page []
   (layout/render &quot;docs.html&quot; {:title &quot;Documentation&quot;
-                              :parser (util/md-&gt;html &quot;/md/parser.md&quot;)
+                              :parser (util/md-&gt;html &quot;/md/mw-parser.md&quot;)
                               :states (list-states)
                               :components [&quot;mw-engine&quot; &quot;mw-parser&quot; &quot;mw-ui&quot;]}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defroutes home-routes

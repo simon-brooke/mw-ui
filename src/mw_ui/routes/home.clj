@@ -23,7 +23,7 @@
 
 (defn docs-page []
   (layout/render "docs.html" {:title "Documentation"
-                              :parser (util/md->html "/md/parser.md")
+                              :parser (util/md->html "/md/mw-parser.md")
                               :states (list-states)
                               :components ["mw-engine" "mw-parser" "mw-ui"]}))
 
