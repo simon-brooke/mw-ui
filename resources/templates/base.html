@@ -19,7 +19,7 @@
     <meta content="{{seconds}}" http-equiv="{{maybe-refresh}}" />
   </head>
   <body>
-      <div id="header" style="  background-image: url( '{{servlet-context}}/img/earth-space-strip.jpg');">
+      <div id="header" style="background-image: url( '{{servlet-context}}/img/earth-space-strip.jpg');">
         <div id="nav">
           <ul class="nav">
             <li class="{{home-selected}}"><a href="{{servlet-context}}/">Home</a></li>
@@ -33,6 +33,11 @@
       </div>
 
     <div id="main-container" class="container">
+	  {% if message %}
+		<div id="announcement">
+			<p class="message">{{message}}</p>
+		</div>
+	  {% endif %}
 	  {% if error %}
 		<div id="announcement">
 			<p class="error">{{error}}</p>

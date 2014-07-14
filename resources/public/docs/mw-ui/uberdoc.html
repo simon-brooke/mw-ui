@@ -3029,7 +3029,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>mw-ui -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">mw-ui</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Web-based user interface for MicroWorld</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.6.0</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">mw-parser</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">lib-noir</td><td class="dotted"><hr /></td><td class="dep-version">0.8.4</td></tr><tr><td class="dep-name">ring-server</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">selmer</td><td class="dotted"><hr /></td><td class="dep-version">0.6.8</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">3.2.1</td></tr><tr><td class="dep-name">com.taoensso/tower</td><td class="dotted"><hr /></td><td class="dep-version">2.0.2</td></tr><tr><td class="dep-name">markdown-clj</td><td class="dotted"><hr /></td><td class="dep-version">0.9.44</td></tr><tr><td class="dep-name">environ</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0</td></tr><tr><td class="dep-name">noir-exception</td><td class="dotted"><hr /></td><td class="dep-version">0.2.2</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-ui.handler">mw-ui.handler</a></li><li><a href="#mw-ui.layout">mw-ui.layout</a></li><li><a href="#mw-ui.middleware">mw-ui.middleware</a></li><li><a href="#mw-ui.render-world">mw-ui.render-world</a></li><li><a href="#mw-ui.repl">mw-ui.repl</a></li><li><a href="#mw-ui.routes.home">mw-ui.routes.home</a></li><li><a href="#mw-ui.util">mw-ui.util</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.handler" name="mw-ui.handler"><h1 class="project-name">mw-ui.handler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.6.0</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">mw-parser</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">lib-noir</td><td class="dotted"><hr /></td><td class="dep-version">0.8.4</td></tr><tr><td class="dep-name">ring-server</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">selmer</td><td class="dotted"><hr /></td><td class="dep-version">0.6.8</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">3.2.1</td></tr><tr><td class="dep-name">com.taoensso/tower</td><td class="dotted"><hr /></td><td class="dep-version">2.0.2</td></tr><tr><td class="dep-name">markdown-clj</td><td class="dotted"><hr /></td><td class="dep-version">0.9.44</td></tr><tr><td class="dep-name">environ</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0</td></tr><tr><td class="dep-name">noir-exception</td><td class="dotted"><hr /></td><td class="dep-version">0.2.2</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-ui.handler">mw-ui.handler</a></li><li><a href="#mw-ui.layout">mw-ui.layout</a></li><li><a href="#mw-ui.middleware">mw-ui.middleware</a></li><li><a href="#mw-ui.render-world">mw-ui.render-world</a></li><li><a href="#mw-ui.repl">mw-ui.repl</a></li><li><a href="#mw-ui.routes.home">mw-ui.routes.home</a></li><li><a href="#mw-ui.routes.rules">mw-ui.routes.rules</a></li><li><a href="#mw-ui.util">mw-ui.util</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.handler" name="mw-ui.handler"><h1 class="project-name">mw-ui.handler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.handler
   (:require [compojure.core :refer [defroutes]]
             [mw-ui.routes.home :refer [home-routes]]
@@ -3208,18 +3208,16 @@ net.brehaut.ClojureTools = (function (SH) {
   (.stop @server)
   (reset! server nil))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.routes.home" name="mw-ui.routes.home"><h1 class="project-name">mw-ui.routes.home</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.routes.home
-  (:use compojure.core)
+  (:use compojure.core
+        [mw-ui.routes.rules :as rules])
   (:require [hiccup.core :refer [html]]
-            [mw-parser.bulk :as compiler]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn home-page []
-  (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; 
-                               :content (html (world/render-world-table)) 
-                               :seconds (or (session/get :seconds) 5) 
-                               :maybe-refresh &quot;refresh&quot;}))</pre></td></tr><tr><td class="docs">
+  (layout/render &quot;home.html&quot; {:title &quot;Welcome to MicroWorld&quot; 
+                              :content (util/md-&gt;html &quot;/md/mw-ui.md&quot;)}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn world-page []
   (layout/render &quot;world.html&quot; {:title &quot;Watch your world grow&quot; 
                                :content (html (world/render-world-table)) 
@@ -3237,29 +3235,58 @@ net.brehaut.ClojureTools = (function (SH) {
                               :parser (util/md-&gt;html &quot;/md/mw-parser.md&quot;)
                               :states (list-states)
                               :components [&quot;mw-engine&quot; &quot;mw-parser&quot; &quot;mw-ui&quot;]}))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn rules-page 
-  ([request]
-    (let [rule-text (:src request)
-          error 
-          (try 
-            (do
-              (if rule-text
-                (session/put! :rules (compiler/compile-string rule-text)))
-              (session/put! :rule-text rule-text)
-              nil)
-            (catch Exception e (.getMessage e)))]
-      (layout/render &quot;rules.html&quot; {:title &quot;Edit Rules&quot; 
-                                   :rule-text (or (session/get :rule-text) (slurp &quot;resources/public/rulesets/basic.txt&quot;))
-                                   :error error})))
-  ([]
-    (rules-page nil)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defroutes home-routes
   (GET &quot;/&quot; [] (home-page))
   (GET &quot;/about&quot; [] (about-page))
   (GET &quot;/docs&quot;  [] (docs-page))
   (GET &quot;/world&quot;  [] (world-page))
-  (GET &quot;/rules&quot; request (rules-page request))
-  (POST &quot;/rules&quot; request (rules-page request)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (GET &quot;/rules&quot; request (rules/rules-page request))
+  (POST &quot;/rules&quot; request (rules/rules-page request)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.routes.rules" name="mw-ui.routes.rules"><h1 class="project-name">mw-ui.routes.rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns mw-ui.routes.rules
+  (:use clojure.walk
+        compojure.core)
+  (:require [hiccup.core :refer [html]]
+            [mw-parser.bulk :as compiler]
+            [mw-ui.layout :as layout]
+            [mw-ui.util :as util]
+            [mw-ui.render-world :as world]
+            [noir.session :as session]))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn process-rules-request
+  [request]
+  (let [src (:src (keywordize-keys (:form-params request)))]
+      (try 
+        (cond src 
+          (let [rules (compiler/compile-string src)]
+            {:rule-text src
+             :rules rules
+             :message (str &quot;Successfully compiled &quot; 
+                           (count rules) 
+                           &quot; rules&quot;)           })
+          true {:rule-text (or 
+                             (session/get :rule-text) 
+                             (slurp &quot;resources/rulesets/basic.txt&quot;))
+                :message &quot;No rules found in request; loading defaults&quot;})
+        (catch Exception e 
+          {:rule-text src
+           :message &quot;An error occurred during compilation&quot;
+           :error (str (.getName (.getClass e)) &quot;: &quot; (.getMessage e))}))))</pre></td></tr><tr><td class="docs"><p>Request handler for the <code>rules</code> request. If the <code>request</code> contains a value
+   for <code>:src</code>, treat that as rule source and try to compile it. If compilation 
+   succeeds, stash the compiled rules and the rule text on the session, and 
+   provide feedback; if not, provide feedback. </p>
+
+<p>   If <code>request</code> doesn't contain a value for <code>:src</code>, load basic rule source from
+   the session or from <code>resources/rulesets/basic.txt</code> and pass that back.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn rules-page 
+  ([request]
+    (let [processed (process-rules-request request)]
+      (if (:rules processed)
+        (session/put! :rules (:rules processed)))
+      (if (:rule-text processed)
+        (session/put! :rule-text (:rule-text processed)))
+      (layout/render &quot;rules.html&quot; 
+                     (merge {:title &quot;Edit Rules&quot;} processed))))
+  ([]
+    (rules-page nil)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.util
   (:require [noir.io :as io]
             [markdown.core :as md]))</pre></td></tr><tr><td class="docs"><p>reads a markdown file from public/md and returns an HTML string</p>

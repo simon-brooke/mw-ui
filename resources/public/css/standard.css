@@ -35,8 +35,8 @@ body {
   width:100%;
   margin: -10px;
   padding: 0.25em 10%;
-  position: fixed;
-  z-index: 149;
+  position: fixed; 
+  z-index: 149; 
   background-color: black;
   background-repeat: no-repeat;
   color: white;
