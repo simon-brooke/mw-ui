@@ -3226,9 +3226,9 @@ front of the sequence of tokens it returns nil.</p>
           (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
             (gen-neighbours-condition comparator quantity property value remainder '=)
             (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '&gt; quantity property value remainder '&gt;)
+            (gen-neighbours-condition comparator quantity property value remainder '&gt;)
             (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '&lt; quantity property value remainder '&lt;)))))))</pre></td></tr><tr><td class="docs">
+            (gen-neighbours-condition comparator quantity property value remainder '&lt;)))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn parse-some-neighbours-condition
   [[SOME NEIGHBOURS &amp; rest]]
   (cond

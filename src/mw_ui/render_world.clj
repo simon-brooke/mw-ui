@@ -3,6 +3,7 @@
             [mw-engine.world :as world]
             [mw-engine.heightmap :as heightmap]
             [mw-engine.natural-rules :as rules]
+            [mw-parser.bulk :as compiler]
             [hiccup.core :refer [html]]
             [noir.session :as session]))
 
@@ -19,14 +20,15 @@
   (format "img/tiles/%s.png" (format-css-class statekey)))
 
 (defn format-mouseover [cell]
-  (str "State " (:state cell) "; altitude: " (:altitude cell) "; fertility: " (:fertility cell)))
+  (str cell))
 
 (defn render-cell
   "Render this world cell as a Hiccup table cell."
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
-            [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]))
+     [:a {:href (format "inspect?x=%d&amp;y=%d" (:x cell) (:y cell))}       
+      [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]]))
 
 (defn render-world-row
   "Render this world row as a Hiccup table row."
@@ -42,7 +44,9 @@
                     (world/make-world 20 20)
                     "resources/public/img/20x20/hill.png")
                    rules/init-rules))
-        rules (or (session/get :rules) rules/natural-rules)
+        rules (or (session/get :rules) 
+                  (do (session/put! :rules (compiler/compile-file "resources/rulesets/basic.txt"))
+                    (session/get :rules)))
         generation (+ (or (session/get :generation) 0) 1)
         w2 (engine/transform-world world rules)
         ]

@@ -3065,8 +3065,15 @@ further rules can be applied.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-cell
   [cell world rules]
   (try
-    (apply-rules cell world rules)
-    (catch Exception e (merge {:state :error :error (.getMessage e)} cell)))) </pre></td></tr><tr><td class="docs"><p>Return a row derived from this row of this world by applying these rules to each cell.</p>
+    (merge 
+      (apply-rules cell world rules) 
+      {:generation (+ (or (:generation cell) 0) 1)})
+    (catch Exception e 
+      (merge cell {:error 
+                   (format &quot;%s at generation %d when in state %s&quot;
+                           (.getMessage e)
+                           (:generation cell)
+                           (:state cell))})))) </pre></td></tr><tr><td class="docs"><p>Return a row derived from this row of this world by applying these rules to each cell.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-world-row
   [row world rules]
   (map #(transform-cell % world rules) row))</pre></td></tr><tr><td class="docs"><p>Return a world derived from this world by applying these rules to each cell.</p>
@@ -3287,7 +3294,7 @@ ignored). Darker shades are higher.</p>
      (fn [cell world]
        (cond (and (= (:state cell) :new) (&gt; (get-int cell :altitude) snowline)) (merge cell {:state :snow})))
      ;; in between, we have a wasteland.
-     (fn [cell world] (cond (= (:state cell) :new) (merge cell {:state :waste})))))</pre></td></tr><tr><td class="docs">
+     (fn [cell world] (cond (= (:state cell) :new) (merge cell {:state :grassland})))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(def natural-rules (flatten
                     (list
                      vegetation-rules
@@ -3373,12 +3380,15 @@ ignored). Darker shades are higher.</p>
 * `cell` a cell within that world;
 * `depth` an integer representing the distance from [x,y] that
   should be searched;
-* `property` a keyword representing a property of the neighbours.
-* `value` a value of that property
+* `property` a keyword representing a property of the neighbours;
+* `value` a value of that property;
+* `op` a comparator function to use in place of `=`.
 </code></pre>
+
+<p>   It gets messy.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn get-neighbours-with-property-value
-  ([world x y depth property value comparator]
-    (filter #(apply comparator (list (get % property) value)) (get-neighbours world x y depth)))
+  ([world x y depth property value op]
+    (filter #(eval (list op (get % property) value)) (get-neighbours world x y depth)))
   ([world x y depth property value]
     (get-neighbours-with-property-value world x y depth property value =))
   ([world cell depth property value]

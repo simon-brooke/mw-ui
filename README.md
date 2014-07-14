@@ -21,7 +21,7 @@ spread across everywhere except the very top of the mountain. But after the
 flood, the waters should drain away again. Go back to [rules](rules) and add 
 this rule at the very top:
 
-	if altitude is more than 9 and state is water then state should be grassland
+    if altitude is more than 9 and state is water then state should be grassland
 
 Now the world alternates between *new* and *grassland*. That's no good! Go back to
 [rules](rules) and delete the rule that you first added - the one that says
