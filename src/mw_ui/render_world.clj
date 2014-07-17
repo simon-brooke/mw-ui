@@ -41,8 +41,9 @@
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                    (world/make-world 20 20)
-                    "resources/public/img/20x20/hill.png")
+                     ;;"resources/public/img/20x20/hill.png"
+                     "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
+                     )
                    rules/init-rules))
         rules (or (session/get :rules) 
                   (do (session/put! :rules (compiler/compile-file "resources/rulesets/basic.txt"))

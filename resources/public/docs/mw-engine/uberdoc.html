@@ -3107,6 +3107,7 @@ ignored). Darker shades are higher.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.heightmap
   (:import [java.awt.image BufferedImage])
   (:use mw-engine.utils
+        mw-engine.world
         ;; interestingly the imagez load-image is failing for me, while the
         ;; collage version is problem free.
         [mikera.image.core :only [filter-image get-pixels]]
@@ -3156,14 +3157,24 @@ ignored). Darker shades are higher.</p>
   the heightmap is at least as large in x and y dimensions as the world.</p>
 
 <ul>
-<li><code>world</code> a world, as defined in <code>world.clj</code>, q.v.;</li>
+<li><code>world</code> a world, as defined in <code>world.clj</code>, q.v.; if world is not supplied,
+a world the size of the heightmap will be created.</li>
 <li><code>imagepath</code> a file path or URL which indicates an image file.</li>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn apply-heightmap
-  [world imagepath]
+  ([world imagepath]
   ;; bizarrely, the collage load-util is working for me, but the imagez version isn't.
-  (let [heightmap (filter-image (grayscale)(load-image imagepath))]
-    (apply vector (map #(apply-heightmap-row % heightmap) world))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
+    (let [heightmap (filter-image (grayscale)(load-image imagepath))]
+      (apply vector (map #(apply-heightmap-row % heightmap) world))))
+  ([imagepath]
+    (let [heightmap (filter-image (grayscale)(load-image imagepath))
+          world (make-world (.getWidth heightmap) (.getHeight heightmap))]
+      (apply vector (map #(apply-heightmap-row % heightmap) world)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
+
+<p>Since the completion of the rule language this is more or less obsolete - 
+there are still a few things that you can do with rules written in Clojure
+that you can't do in the rule language, but not many and I doubt they're
+important.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.natural-rules
   (:use mw-engine.utils

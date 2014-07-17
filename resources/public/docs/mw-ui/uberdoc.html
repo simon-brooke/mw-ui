@@ -3151,8 +3151,8 @@ net.brehaut.ClojureTools = (function (SH) {
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                    (world/make-world 20 20)
-                    &quot;resources/public/img/20x20/hill.png&quot;)
+                     ;;&quot;resources/public/img/20x20/hill.png&quot;
+                     &quot;resources/public/img/heightmaps/great_britain_and_ireland_small.png&quot;)
                    rules/init-rules))
         rules (or (session/get :rules) 
                   (do (session/put! :rules (compiler/compile-file &quot;resources/rulesets/basic.txt&quot;))
