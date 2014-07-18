@@ -3029,7 +3029,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>mw-parser -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">mw-parser</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Parser for production rules for MicroWorld engine</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-parser.bulk">mw-parser.bulk</a></li><li><a href="#mw-parser.core">mw-parser.core</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.bulk" name="mw-parser.bulk"><h1 class="project-name">mw-parser.bulk</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>parse multiple rules from a stream, possibly a file - although the real
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/tools.trace</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">mw-engine</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0-SNAPSHOT</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-parser.bulk">mw-parser.bulk</a></li><li><a href="#mw-parser.core">mw-parser.core</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.bulk" name="mw-parser.bulk"><h1 class="project-name">mw-parser.bulk</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>parse multiple rules from a stream, possibly a file - although the real
 objective is to parse rules out of a block of text from a textarea</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-parser.bulk
@@ -3097,7 +3097,10 @@ more complex issue which I don't yet know how to address.</p>
 </td><td class="codes"><pre class="brush: clojure">(declare parse-conditions)
 (declare parse-not-condition)
 (declare parse-simple-condition)</pre></td></tr><tr><td class="docs"><p>a regular expression which matches string representation of numbers</p>
-</td><td class="codes"><pre class="brush: clojure">(def re-number #&quot;^[0-9.]*$&quot;)</pre></td></tr><tr><td class="docs"><p>If this token appears to represent an explicit number, return that number;
+</td><td class="codes"><pre class="brush: clojure">(def re-number #&quot;^[0-9.]*$&quot;)</pre></td></tr><tr><td class="docs"><p>error thrown when an attempt is made to set a reserved property</p>
+</td><td class="codes"><pre class="brush: clojure">(def reserved-properties-error 
+  &quot;The properties 'x' and 'y' of a cell are reserved and should not be set in rule actions&quot;)</pre></td></tr><tr><td class="docs"><p>error thrown when a rule cannot be parsed</p>
+</td><td class="codes"><pre class="brush: clojure">(def bad-parse-error &quot;I did not understand '%s'&quot;)</pre></td></tr><tr><td class="docs"><p>If this token appears to represent an explicit number, return that number;
    otherwise, make a keyword of it and return that.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- keyword-or-numeric
   [token]
@@ -3138,7 +3141,11 @@ front of the sequence of tokens it returns nil.</p>
           (parse-property-int tokens)
           true (parse-token-value tokens))))
   ([tokens]
-    (parse-simple-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parse a list of values from among these <code>tokens</code>. If <code>expect-int</code> is true, return
+    (parse-simple-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parse a single value from this single token and return just the generated
+   code, not a pair.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn gen-token-value
+  [token expect-int]
+  (first (parse-simple-value (list token) expect-int)))</pre></td></tr><tr><td class="docs"><p>Parse a list of values from among these <code>tokens</code>. If <code>expect-int</code> is true, return
    integers or things which will evaluate to integers.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-disjunct-value
   [[OR token &amp; tokens] expect-int]
@@ -3203,56 +3210,81 @@ front of the sequence of tokens it returns nil.</p>
   ([comp1 quantity property value remainder comp2 distance] 
     [(list comp1  
          (list 'count
-               (list 'get-neighbours-with-property-value 'world '(cell :x) '(cell :y) 1
+               (list 'get-neighbours-with-property-value 'world 
+                     '(cell :x) '(cell :y) distance 
                      (keyword property) (keyword-or-numeric value) comp2))
          quantity)
            remainder])
   ([comp1 quantity property value remainder comp2]
     (gen-neighbours-condition comp1 quantity property value remainder comp2 1)))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...more than 6 neighbours are [condition]'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-comparator-neighbours-condition
-  [[MORE THAN n NEIGHBOURS have-or-are &amp; rest]]
+  [[MORE THAN n NEIGHBOURS WITHIN distance have-or-are &amp; rest]]
   (let [quantity (first (parse-numeric-value (list n)))
         comparator (cond (= MORE &quot;more&quot;) '&gt;
                      (member? MORE '(&quot;fewer&quot; &quot;less&quot;)) '&lt;)]       
     (cond
+      (not (= WITHIN &quot;within&quot;))
+      (parse-comparator-neighbours-condition 
+        (flatten 
+          ;; two tokens were mis-parsed as 'within distance' that weren't
+          ;; actually 'within' and a distance. Splice in 'within 1' and try
+          ;; again.
+          (list MORE THAN n NEIGHBOURS &quot;within&quot; &quot;1&quot; WITHIN distance have-or-are rest)))
       (and quantity 
            comparator
            (= THAN &quot;than&quot;)
            (= NEIGHBOURS &quot;neighbours&quot;))
       (cond
         (= have-or-are &quot;are&quot;) 
-        (let [[value &amp; remainder] rest]
-          (gen-neighbours-condition comparator quantity :state value remainder =))
+        (let [[value &amp; remainder] rest
+              dist (gen-token-value distance true)]
+          (gen-neighbours-condition comparator quantity :state value remainder = dist))
         (= have-or-are &quot;have&quot;)
-        (let [[property comp1 comp2 value &amp; remainder] rest]
+        (let [[property comp1 comp2 value &amp; remainder] rest
+              dist (gen-token-value distance true)]
           (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
-            (gen-neighbours-condition comparator quantity property value remainder =)
+            (gen-neighbours-condition comparator quantity property 
+                                      value remainder = dist)
             (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition comparator quantity property value remainder &gt;)
+            (gen-neighbours-condition comparator quantity property 
+                                      value remainder &gt; dist)
             (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition comparator quantity property value remainder &lt;)))))))</pre></td></tr><tr><td class="docs">
+            (gen-neighbours-condition comparator quantity property 
+                                      value remainder &lt; dist)))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn parse-some-neighbours-condition
   [[SOME NEIGHBOURS &amp; rest]]
   (cond
     (and (= SOME &quot;some&quot;) (= NEIGHBOURS &quot;neighbours&quot;))
     (parse-comparator-neighbours-condition (concat '(&quot;more&quot; &quot;than&quot; &quot;0&quot; &quot;neighbours&quot;) rest))))</pre></td></tr><tr><td class="docs"><p>Parse conditions of the form '...6 neighbours are [condition]'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-simple-neighbours-condition
-  [[n NEIGHBOURS have-or-are &amp; rest]]
+  [[n NEIGHBOURS WITHIN distance have-or-are &amp; rest]]
   (let [quantity (first (parse-numeric-value (list n)))]       
     (cond
       (and quantity (= NEIGHBOURS &quot;neighbours&quot;))
       (cond
+        (not (= WITHIN &quot;within&quot;))
+        (parse-simple-neighbours-condition
+          (flatten 
+            ;; two tokens were mis-parsed as 'within distance' that weren't
+            ;; actually 'within' and a distance. Splice in 'within 1' and try
+            ;; again.
+            (list n NEIGHBOURS &quot;within&quot; &quot;1&quot; WITHIN distance have-or-are rest)))
         (= have-or-are &quot;are&quot;) 
-        (let [[value &amp; remainder] rest]
-          (gen-neighbours-condition '= quantity :state value remainder =))
+        (let [[value &amp; remainder] rest
+              dist (gen-token-value distance true)]
+          (gen-neighbours-condition '= quantity :state value remainder = dist))
         (= have-or-are &quot;have&quot;)
-        (let [[property comp1 comp2 value &amp; remainder] rest]
+        (let [[property comp1 comp2 value &amp; remainder] rest
+              dist (gen-token-value distance true)]
           (cond (and (= comp1 &quot;equal&quot;) (= comp2 &quot;to&quot;))
-            (gen-neighbours-condition '= quantity property value remainder =)
+            (gen-neighbours-condition '= quantity property value remainder = 
+                                      dist)
             (and (= comp1 &quot;more&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '= quantity property value remainder &gt;)
+            (gen-neighbours-condition '= quantity property value remainder &gt; 
+                                      dist)
             (and (= comp1 &quot;less&quot;) (= comp2 &quot;than&quot;))
-            (gen-neighbours-condition '= quantity property value remainder &lt;)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
+            (gen-neighbours-condition '= quantity property value remainder &lt; 
+                                      dist)))))))</pre></td></tr><tr><td class="docs"><p>Parse conditions referring to neighbours</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-neighbours-condition
   [tokens]
   (or
@@ -3297,9 +3329,13 @@ front of the sequence of tokens it returns nil.</p>
    (parse-conditions tokens)))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [property] [arithmetic-operator] [value]',
    e.g. 'fertility should be fertility + 1', or 'deer should be deer - wolves'.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- parse-arithmetic-action 
-  [previous [prop1 should be prop2 operator value &amp; rest]]
-  (if (and (= should &quot;should&quot;)
-           (= be &quot;be&quot;)
+  [previous [prop1 SHOULD BE prop2 operator value &amp; rest]]
+  (cond
+    (member? prop2 '(&quot;x&quot; &quot;y&quot;))
+    (throw 
+      (Exception. reserved-properties-error))
+    (and (= SHOULD &quot;should&quot;)
+           (= BE &quot;be&quot;)
            (member? operator '(&quot;+&quot; &quot;-&quot; &quot;*&quot; &quot;/&quot;)))
     [(list 'merge (or previous 'cell)
            {(keyword prop1) (list 'int 
@@ -3308,8 +3344,12 @@ front of the sequence of tokens it returns nil.</p>
                                           (re-matches re-number value) (read-string value)
                                           true (list 'get-int 'cell (keyword value)))))}) rest]))</pre></td></tr><tr><td class="docs"><p>Parse actions of the form '[property] should be [value].'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- parse-set-action 
-  [previous [property should be value &amp; rest]]
-  (if (and (= should &quot;should&quot;) (= be &quot;be&quot;))
+  [previous [property SHOULD BE value &amp; rest]]
+  (cond 
+    (member? property '(&quot;x&quot; &quot;y&quot;))
+    (throw 
+      (Exception. reserved-properties-error))
+    (and (= SHOULD &quot;should&quot;) (= BE &quot;be&quot;))
     [(list 'merge (or previous 'cell)
            {(keyword property) (cond (re-matches re-number value) (read-string value) true (keyword value))}) rest]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn- parse-simple-action [previous tokens]
@@ -3349,7 +3389,7 @@ front of the sequence of tokens it returns nil.</p>
    (string? line) 
    (let [rule (parse-rule (split (triml line) #&quot;\s+&quot;))]
      (cond rule rule
-       true (throw (Exception. (str &quot;I did not understand '&quot; line &quot;'&quot;)))))
+       true (throw (Exception. (format bad-parse-error line)))))
    true 
    (let [[left remainder] (parse-left-hand-side line)
               [right junk] (parse-right-hand-side remainder)]
