@@ -3029,7 +3029,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>mw-engine -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">mw-engine</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Cellular automaton world builder.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/math.combinatorics</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">net.mikera/imagez</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">fivetonine/collage</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-engine.core">mw-engine.core</a></li><li><a href="#mw-engine.heightmap">mw-engine.heightmap</a></li><li><a href="#mw-engine.natural-rules">mw-engine.natural-rules</a></li><li><a href="#mw-engine.utils">mw-engine.utils</a></li><li><a href="#mw-engine.world">mw-engine.world</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.core" name="mw-engine.core"><h1 class="project-name">mw-engine.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to transform a world and run rules.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/math.combinatorics</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">org.clojure/tools.trace</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">net.mikera/imagez</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">fivetonine/collage</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-engine.core">mw-engine.core</a></li><li><a href="#mw-engine.heightmap">mw-engine.heightmap</a></li><li><a href="#mw-engine.natural-rules">mw-engine.natural-rules</a></li><li><a href="#mw-engine.utils">mw-engine.utils</a></li><li><a href="#mw-engine.world">mw-engine.world</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.core" name="mw-engine.core"><h1 class="project-name">mw-engine.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to transform a world and run rules.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.core
   (:require [mw-engine.world :as world]
@@ -3054,11 +3054,34 @@ See <code>world.clj</code>.</p>
 <p>Each time the world is transformed (see <code>transform-world</code>, for each cell, 
 rules are applied in turn until one matches. Once one rule has matched no
 further rules can be applied.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Apply a single rule to a cell. What this is about is that I want to be able,
+   for debugging purposes, to tag a cell with the rule text of the rule which
+   fired (and especially so when an exception is thrown. So a rule may be either
+   an ifn, or a list (ifn source-text). This function deals with despatching
+   on those two possibilities.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn apply-rule 
+  ([cell world rule]
+   (cond
+     (ifn? rule) (apply-rule cell world rule nil)
+     (seq? rule) (let [[afn src] rule] (apply-rule cell world afn src))))
+                  ;; {:afn afn :src src})))
+     ;; (apply-rule cell world (first rule) (first (rest rule)))))
+  ([cell world rule source]
+    (try
+      (let [result (apply rule (list cell world))]
+        (cond 
+          (and result source) (merge result {:rule source})
+          true result))
+      (catch Exception e
+        (merge cell {:error (format &quot;%s at generation %d when in state %s&quot;
+                           (.getMessage e)
+                           (:generation cell)
+                           (:state cell))
+                     :error-rule source})))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- apply-rules
   [cell world rules]
   (cond (empty? rules) cell
-    true (let [result (apply (eval (first rules)) (list cell world))]
+    true (let [result (apply-rule cell world (first rules))]
            (cond result result
              true (apply-rules cell world (rest rules))))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules. If an
    exception is thrown, cache its message on the cell and set state to error</p>
