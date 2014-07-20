@@ -3053,18 +3053,11 @@ objective is to parse rules out of a block of text from a textarea</p>
    function, and return the sequence of such functions.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn compile-string
   [string]
-  (map #(compile-rule % true) (remove comment? (split string #&quot;\n&quot;))))</pre></td></tr><tr><td class="docs"><p>Compile each non-comment line of the file indicated by this <code>filename</code> into 
+  (map #(compile-rule % true) (remove comment? (trim (split string #&quot;\n&quot;)))))</pre></td></tr><tr><td class="docs"><p>Compile each non-comment line of the file indicated by this <code>filename</code> into 
    an executable anonymous function, and return the sequence of such functions.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn compile-file 
   [filename]
-  (compile-string (slurp filename)))</pre></td></tr><tr><td class="docs"><p> (let [lines 
-       (doall (with-open [rdr (reader filename)] (line-seq rdr)))]
-   (map parse-line lines)))</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>(defn parse-string
- "Parse rules from successive lines in this <code>string</code>"
-  [string]
-  (parse-from-reader (BufferedReader. (StringReader. string))))</p>
-</td><td class="codes"></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.core" name="mw-parser.core"><h1 class="project-name">mw-parser.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A very simple parser which parses production rules of the following forms:</p>
+  (compile-string (slurp filename)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-parser.core" name="mw-parser.core"><h1 class="project-name">mw-parser.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A very simple parser which parses production rules of the following forms:</p>
 
 <ul>
 <li>"if altitude is less than 100 and state is forest then state should be climax and deer should be 3"</li>
