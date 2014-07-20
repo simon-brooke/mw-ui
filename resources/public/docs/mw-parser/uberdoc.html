@@ -3162,7 +3162,7 @@ front of the sequence of tokens it returns nil.</p>
   ([tokens expect-int]
     (or 
       (parse-disjunct-value tokens expect-int)
-      (parse-simple-value tokens)))
+      (parse-simple-value tokens expect-int)))
   ([tokens]
     (parse-value tokens false)))</pre></td></tr><tr><td class="docs"><p>Parses a condition of the form '[property] in [value] or [value]...'</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-member-condition

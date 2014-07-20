@@ -28,7 +28,7 @@
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
      [:a {:href (format "inspect?x=%d&amp;y=%d" (:x cell) (:y cell))}       
-      [:img {:alt (world/format-cell cell) :src (format-image-path state)}]]]))
+      [:img {:alt (:state cell) :src (format-image-path state)}]]]))
 
 (defn render-world-row
   "Render this world row as a Hiccup table row."
@@ -41,8 +41,8 @@
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                     ;;"resources/public/img/20x20/hill.png"
-                     "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
+                     "resources/public/img/20x20/hill.png"
+                     ;; "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
                      )
                    rules/init-rules))
         rules (or (session/get :rules) 
