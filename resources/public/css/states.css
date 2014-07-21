@@ -6,8 +6,20 @@ td.water {
  	background-color: blue;
 }
 
-td.pasture, td.grassland {
+td.pasture, td.grassland, td.meadow {
 	background-color: lime;
+}
+
+td.crop {
+	background-color: yellow;
+}
+
+td.camp, td.house, td.inn, td.market {
+	background-color: gray;
+}
+
+td.ploughland {
+	background-color: brown;
 }
 
 td.heath {
@@ -29,3 +41,12 @@ td.climax {
 td.fire {
  	background-color: orange;
 }
+
+td.error, td.plague {
+	background-color: red;
+}
+
+td.snow, td.ice {
+	background-color: white;
+}
+

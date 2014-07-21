@@ -1,3 +1,6 @@
+;; hack to speed up processing on the 'great britain and ireland' map
+if state is water then state should be water
+
 # Human settlement
 
 ;; nomads make their first significant camp near water because of fish and
@@ -5,26 +8,26 @@
 if state is in grassland or heath and more than 3 neighbours are water and generation is more than 20 then state should be camp
 
 ;; sooner or later nomads learn to keep flocks
-if state is in grassland or heath and some neighbours are camp then state should be meadow
+if state is in grassland or heath and some neighbours are camp then state should be pasture
 
 ;; and more herds support more people
-if state is in grassland or heath and more than 2 neighbours are meadow then state should be camp
-if state is meadow and more than 3 neighbours are meadow and fewer than 1 neighbours are camp and fewer than 1 neighbours within 2 are house then state should be camp
+if state is in grassland or heath and more than 2 neighbours are pasture then state should be camp
+if state is pasture and more than 3 neighbours are pasture and fewer than 1 neighbours are camp and fewer than 1 neighbours within 2 are house then state should be camp
 
 ;; the idea of agriculture spreads
-if state is in grassland or heath and some neighbours are meadow and some neighbours within 3 are house then state should be meadow
+if state is in grassland or heath and some neighbours are pasture and some neighbours within 3 are house then state should be pasture
 
 ;; nomads move on
 if state is camp then 1 chance in 5 state should be waste
 
-;; meadow that's too far from a house or camp will be abandoned
-if state is meadow and fewer than 1 neighbours within 3 are house and fewer than 1 neighbours within 2 are camp then state should be heath
+;; pasture that's too far from a house or camp will be abandoned
+if state is pasture and fewer than 1 neighbours within 3 are house and fewer than 1 neighbours within 2 are camp then state should be heath
 
 ;; markets spring up near settlements
-if state is in grassland or meadow and more than 1 neighbours are house then 1 chance in 10 state should be market
+if state is in grassland or pasture and more than 1 neighbours are house then 1 chance in 10 state should be market
 
 ;; good fertile pasture close to settlement will be ploughed for crops
-if state is meadow and fertility is more than 10 and altitude is less than 100 and some neighbours are camp or some neighbours are house then state should be ploughland
+if state is pasture and fertility is more than 10 and altitude is less than 100 and some neighbours are camp or some neighbours are house then state should be ploughland
 
 if state is ploughland then state should be crop
 
@@ -33,25 +36,25 @@ if state is crop then state should be grassland
 
 ;; if there's reliable food available, nomads build permanent settlements
 if state is in camp or abandoned and some neighbours are crop then state should be house
-if state is abandoned and some neighbours are meadow then state should be house
+if state is abandoned and some neighbours are pasture then state should be house
 ;; people camp near to markets
 if state is in waste or grassland and some neighbours are market then state should be camp
 
 ;; a market in a settlement survives
-if state is market and more than 3 neighbours are house then state should be market
 if state is market and some neighbours are inn then state should be market
 if state is market then state should be grassland
 
 ;; a house near a market in a settlement will become an inn
-if state is house and some neighbours are market and more than 1 neighbours are house then state should be inn
+if state is house and some neighbours are market and more than 1 neighbours are house then 1 chance in 5 state should be inn
 ;; but it will need some local custom to survive
-if state is inn and fewer than 2 neighbours are house then state should be house
+if state is inn and fewer than 3 neighbours are house then state should be house
 
 ;; if there aren't enough resources houses should be abandoned
 ;; resources from fishing
 if state is house and more than 2 neighbours are water then state should be house
 ;; from farming
-if state is house and some neighbours are meadow then state should be house
+if state is house and some neighbours are pasture then state should be house
+if state is house and some neighbours are ploughland then state should be house
 if state is house and some neighbours are crop then state should be house
 ;; from the market
 if state is house and some neighbours are market then state should be house
@@ -66,14 +69,14 @@ if state is abandoned then 1 chance in 5 state should be waste
 
 if state is grassland then 1 chance in 10 state should be heath
 
-;; heath below the treeline grows gradually into forest, providing browsing pressure is not to high
+;; heath below the treeline grows gradually into forest
 
-if state is heath and deer are fewer than 6 and altitude is less than 150 then state should be scrub 
+if state is heath and altitude is less than 120 then state should be scrub 
 if state is scrub then 1 chance in 5 state should be forest
 
 ;; Forest on fertile land grows to climax
 
-if state is forest and fertility is more than 5 then state should be climax   
+if state is forest and fertility is more than 5 and altitude is less than 70 then state should be climax   
     
 ;; Climax forest occasionally catches fire (e.g. lightning strikes)
 
@@ -83,11 +86,14 @@ if state is climax then 1 chance in 500 state should be fire
 if state is in climax or camp or house or inn and some neighbours are fire then 1 chance in 3 state should be fire
 
 ;; Climax forest near to settlement may be cleared for timber
-if state is in climax and more than 3 neighbours within 2 are house then state should be waste
+if state is in climax and more than 3 neighbours within 2 are house then state should be scrub
 
 ;; After fire we get waste
 
 if state is fire then state should be waste
+
+;; waste near settlement that is fertile becomes ploughland
+if state is waste and fertility is more than 10 and some neighbours are house or some neighbours are camp then state should be ploughland
 
 ;; And after waste we get pioneer species; if there's a woodland seed
 ;; source, it's going to be heath, otherwise grassland.

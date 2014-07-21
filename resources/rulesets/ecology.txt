@@ -1,0 +1,99 @@
+## Ruleset which attempts to model predator/prey ecology (not very well yet)
+
+## Vegetation rules
+;; rules which populate the world with plants
+
+;; Occasionally, passing birds plant tree seeds into grassland 
+
+if state is grassland then 1 chance in 10 state should be heath
+
+;; heath below the treeline grows gradually into forest, providing browsing pressure is not to high
+
+if state is heath and deer are fewer than 6 and altitude is less than 120 then state should be scrub 
+if state is scrub then 1 chance in 5 state should be forest
+
+;; Forest on fertile land at low altitude grows to climax
+
+if state is forest and fertility is more than 5 and altitude is less than 70 then state should be climax   
+    
+;; Climax forest occasionally catches fire (e.g. lightning strikes)
+
+if state is climax then 1 chance in 500 state should be fire
+
+;; Climax forest neighbouring fires is likely to catch fire
+if state is climax and some neighbours are fire then 1 chance in 3 state should be fire
+
+;; After fire we get waste
+
+if state is fire then state should be waste
+
+;; And after waste we get pioneer species; if there's a woodland seed
+;; source, it's going to be heath, otherwise grassland.
+
+if state is waste and some neighbours are scrub then state should be heath
+if state is waste and some neighbours are forest then state should be heath
+if state is waste and some neighbours are climax then state should be heath
+if state is waste then state should be grassland
+
+## Herbivore rules
+
+;; rules describing the impact of herbivores on the environment
+    
+;; if there are too many deer for the fertility of the area to sustain,
+;; some die or move on.
+;; if deer are more than fertility then deer should be fertility / 2
+
+;; deer arrive occasionally at the edge of the map.
+
+if x is 0 or y is 0 and deer are 0 then 1 chance in 50 deer should be 2 
+        
+;; deer gradually spread through the world by breeding or migrating.
+if fertility is more than 10 and deer is 0 and some neighbours have deer more than 2 then deer should be 2
+
+;; deer breed.
+
+if deer are more than 1 then deer should be deer * 2
+
+## Predator rules
+
+;; rules describing the impact of predator behaviour on the environment
+
+if deer are more than wolves then deer should be deer - wolves
+
+;; if there are not enough deer to sustain the population of wolves,
+;; some wolves die or move on.
+
+if wolves are more than deer then deer should be 0 and wolves should be deer + 0
+
+;; wolves arrive occasionally at the edge of the map.
+
+if x is 0 or y is 0 and wolves are 0 then 1 chance in 50 wolves should be 2 
+
+;; wolves gradually spread through the world by breeding or migrating.
+
+if state is not water and wolves is 0 and some neighbours have wolves more than 2 then 1 chance in 5 wolves should be 2
+
+;; wolves breed.
+
+if wolves are more than 1 then wolves should be wolves * 2
+
+## Potential blockers
+
+;; Forest increases soil fertility. 
+if state is in forest or climax then fertility should be fertility + 1
+
+
+## Initialisation rules
+
+;; Rules which deal with state 'new' will waste less time if they're near the
+;; end of the file
+
+;; below the waterline we have water.
+
+if state is new and altitude is less than 10 then state should be water
+
+;; above the snowline we have snow.
+if state is new and altitude is more than 200 then state should be snow
+
+;; otherwise, we have grassland.
+if state is new then state should be grassland

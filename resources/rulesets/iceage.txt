@@ -1,0 +1,65 @@
+## Ruleset which attempts to model retreat of ice after an iceage
+
+if generation is less than 5 then state should be ice
+
+;; Limitations: because the rule language doesn't (yet) allow sophisticated
+;; arithmetic, the ice retreats north to south (southern hemisphere).
+
+## Vegetation rules
+;; rules which populate the world with plants
+
+;; Occasionally, passing birds plant tree seeds into grassland 
+
+if state is grassland then 1 chance in 10 state should be heath
+
+;; heath below the treeline grows gradually into forest, providing browsing pressure is not to high
+
+if state is heath and fertility is more than 10 and altitude is less than 120 then state should be scrub 
+if state is scrub and fertility is more than 20 then 1 chance in 20 state should be forest
+
+;; Forest on fertile land grows to climax
+
+if state is forest and fertility is more than 30 and altitude is less than 70 then state should be climax   
+    
+;; Climax forest occasionally catches fire (e.g. lightning strikes)
+
+if state is climax then 1 chance in 500 state should be fire
+
+;; Climax forest neighbouring fires is likely to catch fire
+if state is climax and some neighbours are fire then 1 chance in 3 state should be fire
+
+;; After fire we get waste
+
+if state is fire then state should be waste
+
+;; And after waste we get pioneer species; if there's a woodland seed
+;; source, it's going to be heath, otherwise grassland.
+
+if state is waste and some neighbours are scrub then state should be heath
+if state is waste and some neighbours are forest then state should be heath
+if state is waste and some neighbours are climax then state should be heath
+if state is waste then state should be grassland
+
+## Potential blockers
+
+;; Woody plants increase soil fertility over time. 
+if state is in heath or scrub or forest or climax then fertility should be fertility + 1
+
+
+## Initialisation rules
+
+;; Rules which deal with state 'new' will waste less time if they're near the
+;; end of the file
+
+if state is new then state should be ice
+
+;; thaw moves gradually southwards (the distinction between 'ice' and 'snow' is
+;; just a hack because I can't do complex arithmetic in rules)
+;; below the waterline ice thaws to water.
+if state is ice and generation is more than y and altitude is less than 10 then state should be water
+;; otherwise it thaws to snow
+if state is ice and generation is more than y then state should be snow
+
+;; thaw moves gradually up the hills
+
+if state is snow and generation is more than altitude then state should be waste
