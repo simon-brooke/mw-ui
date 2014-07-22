@@ -1,0 +1,37 @@
+{% extends "templates/base.html" %}
+{% block content %}
+<form action="{{servlet-context}}/params" method="POST">
+	<p class="widget">
+		<label for="ruleset">The rule set to use</label>
+		<select name="ruleset">
+			<option value="">No change - use your current rules</option>
+			{% for ruleset in rulesets %}
+			<option value="{{ruleset}}">{{ruleset}}</option>
+			{% endfor %}
+		</select>
+	</p>
+	<p class="widget">
+		<label for="heightmap">The map to use</label>
+		<select name="heightmap">
+			<option value="">No change - use your current map</option>
+			{% for heightmap in heightmaps %}
+			<option value="{{heightmap}}">{{heightmap}}</option>
+			{% endfor %}
+		</select>
+	</p>
+	<p class="widget">
+		<label for="pause">
+			Pause duration
+		</label>
+		<input id="pause" type="range" value="{{pause}}" min="0" max="60" step="5" />
+	</p>
+	<p class="help">
+		The pause beteen computing a new state of your world, in seconds
+	</p>
+	<p class="widget">
+		<label for="submit">When you have chosen your parameters</label>
+        <input name="submit" id="submit" type="submit" value="Save your parameters!"/>
+	</p>
+</form>
+
+{% endblock %}
