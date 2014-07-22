@@ -1,7 +1,5 @@
 ## Ruleset which attempts to model retreat of ice after an iceage
 
-if generation is less than 5 then state should be ice
-
 ;; Limitations: because the rule language doesn't (yet) allow sophisticated
 ;; arithmetic, the ice retreats north to south (southern hemisphere).
 
