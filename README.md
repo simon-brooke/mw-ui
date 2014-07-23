@@ -88,6 +88,9 @@ all those:
 I'll leave you to work out what the rules of life are for yourself, from the
 Wiki page I linked to.
 
+**CHEAT** _You'll find other rule sets you can explore if you go to the_
+_[Parameters](params) page_.
+
 ### Change the engine
 
 If you want to modify the engine itself, you will need 
@@ -130,6 +133,19 @@ You'll need an editor. I recommend either [NightCode](https://nightcode.info/),
 which is quite small and will run on a Raspberry Pi, or 
 [LightTable](http://www.lighttable.com/), which is extremely helpful but needs
 a more powerful computer.
+
+#### Worthwhile projects
+
+If you would like to work on the engine, there's things that would be worth
+improving:
+
+1. Better arithmetic in actions 
+2. Better arithmetic in conditions - it would be useful to be able to say _'if generation is more than 64 - y then state should be snow'_. This would make the ice retreat in the right direction in the iceage rule set.
+3. Better error messages when rules don't parse, explaining where the problem occured _(very hard)_.
+4. Make this all work in ClojureScript in the browser, so there's less load on the server and one server can support more users _(quite hard)_.
+5. Optimisation: MicroWorld runs quite slowly, you can't really do big maps and one server won't support many users. There must be many ways performance can be improved.
+
+If you make changes which you think improve MicroWorld, please [mail them to me](mailto:simon@journeyman.cc).
 
 Have fun!
 

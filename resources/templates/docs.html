@@ -7,6 +7,7 @@
     		<li><a href="#grammar">Rule language</a></li>
     		<li><a href="#states">Implemented states</a></li>
     		<li><a href="#api">API documentation</a></li>
+    		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
     	<a name="parser"/>
@@ -17,6 +18,7 @@
     		<li><a href="#grammar">Rule language</a></li>
     		<li><a href="#states">Implemented states</a></li>
     		<li><a href="#api">API documentation</a></li>
+    		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
     	<h2><a name="states">Implemented states</h2>
@@ -42,6 +44,7 @@
     		<li><a href="#grammar">Rule language</a></li>
     		<li><a href="#states">Implemented states</a></li>
     		<li><a href="#api">API documentation</a></li>
+    		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
     	<h2><a name="api">API documentation</a></h2>
@@ -58,5 +61,110 @@
         	</li>
         	{% endfor %}
         </ul>
+
+     	<hr/>
+    	<menu>
+    		<li><a href="#top">Top</a></li>
+    		<li><a href="#grammar">Rule language</a></li>
+    		<li><a href="#states">Implemented states</a></li>
+    		<li><a href="#api">API documentation</a></li>
+    		<li><a href="#teachers">For teachers</a></li>
+    	</menu>
+    	<hr/>
+       <h2><a name="teachers">For teachers</a></h2>
+       <p>MicroWorld was written in the hope that it would be of use for teachers,
+       including teachers in primary schools. The reason for attempting to write
+       a very simple rule language was that young people would be able to create
+       their own rules and rule sets.</p>
+
+       <h3>Classroom setup</h3>
+       <p>MicroWorld will run on a Raspberry Pi, and I plan to produce a 
+       downloadable SD card image which auto-runs it. One ideal classroom setup
+       would be to have one Raspberry Pi running MicroWorld to every group of 
+       two or three children.</p>
+       <p>MicroWorld will also run on any ordinary PC, including Windows, 
+       Macintosh and Linux machines. I plan to produce a packaged installer
+       for each operating system.</p>
+       <h4>Servers and clients</h4>
+       <p>MicroWorld is a web-app, which means it runs in a web server and the
+       user interface is a web browser. It would be possible to arrange a 
+       classroom with one copy of MicroWorld on a single server, and each child's
+       machine running MicroWorld from that single server.</p> 
+       <p>However, performance isn't very good, and unless you have an unusually
+       powerful server you may find that when a full class of pupils are running
+       MicroWorld from a single server performance may be frustratingly poor. 
+       Check your performance before introducing a class to it, and if in doubt,
+       running a separate copy on each machine used by children may well be more
+       satisfactory.</p>
+
+       <h3>Subject areas</h3>
+       <p>One of my main objectives in writing MicroWorld was to create a system
+       which would be engaging for children and would enable them to see 
+       computing in the context of other subject areas.</p>
+       <h4>Geography</h4> 
+       <p>Maps of Great Britain and Ireland, and of the Isle of Man, are included
+       in the distribution; however, only the 'small' version of the map of 
+       Great Britain and Ireland is really useable, the others are too big and
+       will be two slow. However, you can cut a map of your local area from the
+       larger maps if that is helpful to your class.</p>
+       <p>The following rulesets are of potential use in geography teaching:</p>
+       <dl>
+        <dt>basic</dt>
+        <dd>A very simple ruleset which simply establishes vegetation in the
+        landscape. Not particularly useful in itself, but a good ruleset for
+        children to use as a basis for their own projects.</dd>
+       	<dt>iceage<dt>
+       	<dd>illustrates ice thawing gradually. Because of inadequacies in the
+       	rule language, currently the ice retreats from north to south, which is
+       	of course wrong for the northern hemisphere; but the principle of 
+       	retreating ice, the way in which ice retreats up mountains, and the way 
+       	in which ecosystems establish themselves.</dd>
+       	<dt>ecology</dt>
+       	<dd>Attempts to model the effects of browsers and predators - represented
+       	by deer and wolves, respectively - on the landscape.</dd>
+       	<dt>settlement</dt>
+       	<dd>illustrates human settlement appearing first on coastal promontaries
+       	(e.g. kitchen-midden people), gradually spreads inland (in this model as
+       	nomadic pastoralists), and forms permanent settlements where conditions
+       	are favourable. This helps explore why the towns in your locality are
+       	where they are. The model is obviously simplified, but produces a
+       	potentially useful account of settlement in at least north-western Europe
+       	from paleolithic up to at least late bronze age. <b>Note</b> that unless
+       	your map has at least some coastal promontaries this ruleset will need
+       	to be modified.</dd>
+       	<dt>
+       </dl>
+       <p>All of these rulesets are deliberately simple. This is so that 
+       children have something to start with, but so that they can actually make
+       real, demonstrable improvements quite simply.</p>
+       <h4>History</h4>
+       <p>The <em>settlement</em> ruleset is probably the best starting point for
+       history exploration. As described above, it essentially covers only 
+       pre-history; the development of the feudal system, for example, or of 
+       industrialisation, are not modelled. They could be, as (more advanced) 
+       class projects. Writing rules will enable discussion of why castles, or
+       mills, are positioned where they are, and what the social consequences of
+       these developments are.</p>
+       <h4>IT/Informatics</h4>
+       <p>Obviously, any of the rulesets but particularly the <em>gameoflife</em>
+       ruleset are good introduction points to informatics lessons. The rule
+       language is sufficiently simple that introducing children to writing
+       their own rules can begin almost as soon as basic literacy is 
+       established.</p>
+       <p>In more advanced IT lessons, at the upper end of primary school or in
+       secondary schools, I would encourage you to explore modifying the engine
+       itself in your classes.</p>
+
+		<h3>Lesson plans</h3>
+       	<ul>
+       	{% for lesson in lessons %}
+       		<li>
+       			<a href="{{servlet-context}}/md?content=lesson-plans/{{lesson}}.md">
+        			{{lesson}}
+        		</a>
+        	</li>
+        {% endfor %}
+        </ul>
+
     </div>
 {% endblock %}

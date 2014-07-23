@@ -10,11 +10,11 @@
             [noir.session :as session]))
 
 (defn- send-params []
-  {{:title "Choose your world"
-    :heightmaps (util/list-resources "resources/public/img/heightmaps" #"([0-9a-z-_]+).png")
-    :pause (or (session/get :pause) 5)
-    :rulesets (util/list-resources "resources/rulesets" #"([0-9a-z-_]+).txt")
-    })
+  {:title "Choose your world"
+   :heightmaps (util/list-resources "resources/public/img/heightmaps" #"([0-9a-z-_]+).png")
+   :pause (or (session/get :pause) 5)
+   :rulesets (util/list-resources "resources/rulesets" #"([0-9a-z-_]+).txt")
+   })
 
 (defn params-page 
   "Handler for params request. If no `request` passed, show empty params form.

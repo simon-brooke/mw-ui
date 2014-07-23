@@ -14,7 +14,7 @@
                  [noir-exception "0.2.2"]]
 
   :repl-options {:init-ns mw-ui.repl}
-  :plugins [[lein-ring "0.8.10"]
+  :plugins [[lein-ring "0.8.11"]
             [lein-environ "0.5.0"]
             [lein-marginalia "0.7.1"]]
   :ring {:handler mw-ui.handler/app

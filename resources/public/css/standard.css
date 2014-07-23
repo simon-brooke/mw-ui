@@ -6,14 +6,10 @@ body {
 /* Overall container div, holds all content of page. Yes, I know it shouldn't have fixed width */
 #main-container{
   clear: both;
-  width:80%;
-  margin: 0 10%;
-  padding: 0;
-  padding-top: 12em;
-  padding-bottom: 2em;
+  width:100%;
 }
 
-/* footer of the document, within #main-container */
+/* footer of the document */
 #footer {
   clear: both;
   font-size: smaller;
@@ -33,12 +29,8 @@ body {
 
 #header {
   width:100%;
-  margin: -10px;
-  padding: 0.25em 10%;
-  position: fixed; 
-  z-index: 149; 
+  padding: 2em 10% 0.25em 10%;
   background-color: black;
-  background-repeat: no-repeat;
   color: white;
 }
 
@@ -53,10 +45,11 @@ body {
 
 
 #nav{
-  float: left;
   margin: 0;
-  min-height: 56px;
-  width: 60%;
+  width: 100%;
+  position: fixed;
+  z-index: 149;
+  background:rgba(40,40,40,0.8);
 }
 
 #nav ul li {
@@ -69,14 +62,15 @@ body {
   color: white;
   text-decoration: none;
   font-weight: bold;
-  padding: 0.25em 0.75em;
+  padding: 0.1em 0.75em;
   margin: 0;
 }
 #nav ul li.active a { background: silver;}
 li.nav-item a:hover { background: rgb( 240, 240, 240) }
 li.nav-item a:active { background: gray; color: white; }
+
 .error {
-    background-color: #663399;;
+    background-color: red;
     color: white;
 }
 
@@ -107,9 +101,11 @@ h1 {
 h1, h2, h3, h4, h5 {
   background-color: black;
   color: white;
-  padding-left: -20px;
 }
 
+p, pre, ul, ol, dl, h1, h2, h3, h4, h5 {
+  padding: 0.25em 10%;
+}
 
 input {
   background-color: white;
@@ -124,8 +120,11 @@ input.required:after {
   color: red;
 }
 
+label {
+  min-width: 35%;
+}
+
 label, input {
-  width: 45%;
   padding: 0.25em 1em;
   margin: 0 0.5em;
 }

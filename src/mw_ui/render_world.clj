@@ -41,7 +41,7 @@
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                     "resources/public/img/20x20/hill.png"
+                     "resources/public/img/heightmaps/small_hill.png"
                      ;; "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
                      )
                    rules/init-rules))
