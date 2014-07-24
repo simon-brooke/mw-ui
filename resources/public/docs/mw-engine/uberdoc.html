@@ -3448,7 +3448,7 @@ important.</p>
   [cell x y property value]
   (cond 
     (and (= x (:x cell)) (= y (:y cell)))
-    (merge cell {property value})
+    (merge cell {property value :rule &quot;Set by user&quot;})
     true
     cell))</pre></td></tr><tr><td class="docs"><p>Return a world like this <code>world</code> but with the value of exactly one <code>property</code>
    of one <code>cell</code> changed to this <code>value</code></p>

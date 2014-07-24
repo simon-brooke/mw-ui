@@ -7,7 +7,8 @@
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
             [noir.io :as io]
-            [noir.session :as session]))
+            [noir.session :as session]
+            [ring.util.response :as response]))
 
 (defn process-rules-request
   [request]
