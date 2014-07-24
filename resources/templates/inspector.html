@@ -1,0 +1,23 @@
+{% extends "templates/base.html" %}
+{% block content %}
+	<div class="content">
+	{{content|safe}}
+	</div>
+	<form action="inspect" method="post">
+		<input type="hidden" name="x" value="{{x}}"/>
+		<input type="hidden" name="y" value="{{y}}"/>
+		<p class="widget">
+			<label for="state">New state</label>
+			<select name="state" id="state">
+				<option value="{{cell.state}}">{{cell.state}}</option>
+			{% for state in states %}
+				<option value="{{state}}">{{state}}</option>
+			{% endfor %}
+			</select>
+		</p>
+		<p class="widget">
+			<label for="submit">To change the state of this cell</label>
+	        <input name="submit" id="submit" type="submit" value="Save state!"/>
+		</p>
+	</form>
+{% endblock %}
