@@ -1,9 +1,9 @@
-(defproject mw-ui "0.1.1-SNAPSHOT"
+(defproject mw-ui "0.1.1"
   :description "Web-based user interface for MicroWorld"
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [mw-engine "0.1.1-SNAPSHOT"]
-                 [mw-parser "0.1.1-SNAPSHOT"]
+                 [mw-engine "0.1.1"]
+                 [mw-parser "0.1.1"]
                  [lib-noir "0.8.4"]
                  [ring-server "0.3.1"]
                  [selmer "0.6.8"]
