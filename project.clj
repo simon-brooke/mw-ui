@@ -19,7 +19,11 @@
             [lein-marginalia "0.7.1"]]
   :ring {:handler mw-ui.handler/app
          :init    mw-ui.handler/init
-         :destroy mw-ui.handler/destroy}
+         :destroy mw-ui.handler/destroy
+         :resources-path "resources"
+         :war-resources-path "war-resources"
+         :uberwar-name "microworld.war"
+         }
   :profiles
   {:uberjar {:aot :all}
    :production {:ring {:open-browser? false

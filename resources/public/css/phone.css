@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+  font-size: larger;
 }
 
 /* ids generally in document order */
@@ -11,40 +12,37 @@ body {
 
 /* footer of the document */
 #footer {
-  clear: both;
-  font-size: smaller;
-  padding: 0 2em;
-  text-align: center;
-  color:white;
-  background:rgba(196,196,196,0.95);
-  width: 100%;
-  margin: 0;
-  bottom:0;
-  position:fixed;
-  z-index:150;
-  _position:absolute;
-  _top:expression(eval(document.documentElement.scrollTop+
-        (document.documentElement.clientHeight-this.offsetHeight)));
+  display: none;
 }
 
 #header {
   width:100%;
-  padding: 2em 0 0.25em 0;
+  padding: 0.25em 5% 0.25em 5%;
   background-color: black;
   color: white;
+}
+
+#header h1 {
+	background-color: transparent;
 }
 
 #nav{
   margin: 0;
   padding: 0;
-  width: 100%;
   position: fixed;
   z-index: 149;
   background:rgba(40,40,40,0.8);
 }
 
-/* only needed for fly-out menu effect on tablet and phone stylesheets */
+#nav:hover #nav-menu {
+	display: inline;
+}
+	
 #nav-icon {
+  padding: 0.25em;
+}
+
+#nav-menu {
   display: none;
 }
 
@@ -61,7 +59,6 @@ body {
   padding: 0.1em 0.75em;
   margin: 0;
 }
-
 #nav ul li.active a { background: silver;}
 li.nav-item a:hover { background: rgb( 240, 240, 240) }
 li.nav-item a:active { background: gray; color: white; }
@@ -100,8 +97,9 @@ h1, h2, h3, h4, h5 {
   color: white;
 }
 
-p, pre, ul, ol, dl, menu, h1, h2, h3, h4, h5 {
-  padding: 0.25em 10%;
+p, pre, ul, ol, dl, h1, h2, h3, h4, h5 {
+  width: 100%;
+  padding: 0.25em 1em;
 }
 
 input {
@@ -138,9 +136,9 @@ menu li::before {
   content: "|| ";
 }
 
+
 div.world table, div.world tr td {
 	padding: 0;
 	margin: 0;
 	border: none;
 }
-

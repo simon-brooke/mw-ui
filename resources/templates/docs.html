@@ -10,10 +10,11 @@
     		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
-    	<a name="parser"/>
+		<div><a name="parser">&nbsp;</a></div>
     	{{parser|safe}}
     	<hr/>
-    	<menu>
+ 		<div><a name="states">&nbsp;</a></div>
+	   	<menu>
     		<li><a href="#top">Top</a></li>
     		<li><a href="#grammar">Rule language</a></li>
     		<li><a href="#states">Implemented states</a></li>
@@ -21,7 +22,7 @@
     		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
-    	<h2><a name="states">Implemented states</h2>
+    	<h2>Implemented states</h2>
     	<p>As it says in the rule language documentation, above, you can use
     	any sequence of alphanumeric characters you want as the name of a state  
     	&emdash; you can call it whatever you like. However, if you use state
@@ -38,6 +39,7 @@
     	{% endfor %}
     	</ul>
     	
+		<div><a name="api">&nbsp;</a></div>
     	<hr/>
     	<menu>
     		<li><a href="#top">Top</a></li>
@@ -47,7 +49,7 @@
     		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
-    	<h2><a name="api">API documentation</a></h2>
+    	<h2>API documentation</h2>
 
 		<p>If you're adventurous you may want to modify the MicroWorld engine
 		itself. To do that you'll need this documentation.
@@ -62,6 +64,7 @@
         	{% endfor %}
         </ul>
 
+		<div><a name="teachers">&nbsp;</a></div>
      	<hr/>
     	<menu>
     		<li><a href="#top">Top</a></li>
@@ -71,9 +74,9 @@
     		<li><a href="#teachers">For teachers</a></li>
     	</menu>
     	<hr/>
-       <h2><a name="teachers">For teachers</a></h2>
+       <h2>For teachers</h2>
        <p>MicroWorld was written in the hope that it would be of use for teachers,
-       including teachers in primary schools. The reason for attempting to write
+       particularly teachers in primary schools. The reason for attempting to write
        a very simple rule language was that young people would be able to create
        their own rules and rule sets.</p>
 
@@ -165,6 +168,14 @@
         	</li>
         {% endfor %}
         </ul>
+     	<hr/>
+    	<menu>
+    		<li><a href="#top">Top</a></li>
+    		<li><a href="#grammar">Rule language</a></li>
+    		<li><a href="#states">Implemented states</a></li>
+    		<li><a href="#api">API documentation</a></li>
+    		<li><a href="#teachers">For teachers</a></li>
+    	</menu>
 
     </div>
 {% endblock %}

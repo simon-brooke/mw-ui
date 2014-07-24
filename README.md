@@ -153,5 +153,5 @@ Have fun!
 
 Copyright © 2014 [Simon Brooke](mailto:simon@journeyman.cc)
 
-Distributed under the terms of the [GNU General Public License v2]
-(http://www.gnu.org/licenses/gpl-2.0.html)
+Distributed under the terms of the 
+[GNU General Public License v2](http://www.gnu.org/licenses/gpl-2.0.html)

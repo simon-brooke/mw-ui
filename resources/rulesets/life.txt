@@ -1,0 +1,33 @@
+# Conway's Game of Life is the classic cellular automaton.
+
+;; see http://en.wikipedia.org/wiki/Conway's_Game_of_Life
+
+;; This ruleset works with any strictly black and white map, but the maps which
+;; are designed to work with it have names starting 'life'.
+ 
+;; The universe of the Game of Life is an infinite two-dimensional orthogonal 
+;; grid of square cells, each of which is in one of two possible states, alive 
+;; or dead. Every cell interacts with its eight neighbours, which are the 
+;; cells that are horizontally, vertically, or diagonally adjacent. At each 
+;; step in time, the following transitions occur:
+
+;; Any live cell with fewer than two live neighbours dies, as if caused by 
+;; under-population.
+
+if state is black and fewer than 2 neighbours are black then state should be white
+
+;; Any live cell with two or three live neighbours lives on to the next generation.
+
+;; Any live cell with more than three live neighbours dies, as if by overcrowding.
+
+if state is black and more than 3 neighbours are black then state should be white
+
+;; Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
+if state is not black and 3 neighbours are black then state should be black
+
+# Initialisation rules
+
+if state is new and altitude is more than 127 then state should be black
+
+if state is new then state should be white
