@@ -3441,7 +3441,30 @@ important.</p>
   ([world cell depth state]
     (get-neighbours-with-state world (:x cell) (:y cell) depth state))
   ([world cell state]
-    (get-neighbours-with-state world cell 1 state)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.world" name="mw-engine.world"><h1 class="project-name">mw-engine.world</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to create and to print two dimensional cellular automata. Nothing in this
+    (get-neighbours-with-state world cell 1 state)))</pre></td></tr><tr><td class="docs"><p>If this <code>cell</code>s x and y properties are equal to these <code>x</code> and <code>y</code> values,
+   return a cell like this cell but with the value of this <code>property</code> set to
+   this <code>value</code>. Otherwise, just return this <code>cell</code>.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- set-cell-property
+  [cell x y property value]
+  (cond 
+    (and (= x (:x cell)) (= y (:y cell)))
+    (merge cell {property value})
+    true
+    cell))</pre></td></tr><tr><td class="docs"><p>Return a world like this <code>world</code> but with the value of exactly one <code>property</code>
+   of one <code>cell</code> changed to this <code>value</code></p>
+</td><td class="codes"><pre class="brush: clojure">(defn set-property
+  ([world cell property value]
+    (set-property world (:x cell) (:y cell) property value))
+  ([world x y property value]
+    (apply 
+      vector ;; we want a vector of vectors, not a list of lists, for efficiency
+      (map
+        (fn [row]
+          (apply
+            vector
+            (map #(set-cell-property % x y property value)
+                 row)))
+        world))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.world" name="mw-engine.world"><h1 class="project-name">mw-engine.world</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to create and to print two dimensional cellular automata. Nothing in this
 file should determine what states are possible within the automaton, except for the
 initial state, :new.</p>
 

@@ -15,7 +15,10 @@ if state is in grassland or heath and more than 2 neighbours are pasture then st
 if state is pasture and more than 3 neighbours are pasture and fewer than 1 neighbours are camp and fewer than 1 neighbours within 2 are house then state should be camp
 
 ;; the idea of agriculture spreads
-if state is in grassland or heath and some neighbours are pasture and some neighbours within 3 are house then state should be pasture
+if state is in grassland or heath and some neighbours within 3 are house then state should be pasture
+
+;; nomads don't move on while the have crops growing. That would be silly!
+if state is camp and some neighbours are ploughland then state should be camp
 
 ;; nomads move on
 if state is camp then 1 chance in 5 state should be waste
@@ -82,8 +85,8 @@ if state is forest and fertility is more than 5 and altitude is less than 70 the
 
 if state is climax then 1 chance in 500 state should be fire
 
-;; Climax forest neighbouring fires is likely to catch fire. So are buildings.
-if state is in climax or camp or house or inn and some neighbours are fire then 1 chance in 3 state should be fire
+;; Forest neighbouring fires is likely to catch fire. So are buildings.
+if state is in forest or climax or camp or house or inn and some neighbours are fire then 1 chance in 3 state should be fire
 
 ;; Climax forest near to settlement may be cleared for timber
 if state is in climax and more than 3 neighbours within 2 are house then state should be scrub
@@ -123,4 +126,3 @@ if state is new and altitude is more than 200 then state should be snow
 
 ;; otherwise, we have grassland.
 if state is new then state should be grassland
-

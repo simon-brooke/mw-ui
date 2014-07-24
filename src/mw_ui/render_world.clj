@@ -28,7 +28,7 @@
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
-     [:a {:href (format "inspect?x=%d&amp;y=%d" (:x cell) (:y cell))}       
+     [:a {:href (format "inspect?x=%d&y=%d" (:x cell) (:y cell))}       
       [:img {:alt (:state cell) :src (format-image-path state)}]]]))
 
 (defn render-world-row
@@ -63,19 +63,16 @@
                        (map render-world-row w2)))
       [:p (str "Generation " generation)]]))
 
-(defn render-world
-  "Render the world implied by the session as a complete HTML page."
-  []
-  (html
-   [:html
-    [:head
-     [:title "MicroWorld demo"]
-     [:link {:media "only screen and (max-device-width: 480px)" :href "css/phone.css" :type  "text/css" :rel "stylesheet"}]
-     [:link {:media "only screen and (min-device-width: 481px) and (max-device-width: 1024px)" :href "css/tablet.css" :type "text/css" :rel "stylesheet"}]
-     [:link {:media "screen and (min-device-width: 1025px)" :href "css/standard.css" :type "text/css" :rel "stylesheet"}]
-     [:link {:media "print" :href "css/print.css" :type "text/css" :rel "stylesheet"}]
-     [:link {:href "css/states.css" :type "text/css" :rel "stylesheet"}]
-     [:meta {:http-equiv "refresh" :content "5"}]]
-    [:body
-     (render-world-table)
-     ]]))
+(defn render-inspector
+  [cell table]
+  [:table {:class "music-ruled"}
+   [:tr 
+    [:td {:colspan 2 :style "text-align: center;"} 
+     [:img {:src (str "img/tiles/" (name (:state cell)) ".png")
+            :width 64
+            :height 64}]]]
+   [:tr [:th "Key"][:th "Value"]]
+   (map #(vector :tr (vector :th %)(vector :td (cell %))) (keys cell))])
+
+
+  

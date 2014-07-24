@@ -3126,6 +3126,7 @@ net.brehaut.ClojureTools = (function (SH) {
             [mw-engine.natural-rules :as rules]
             [mw-parser.bulk :as compiler]
             [hiccup.core :refer [html]]
+            [noir.io :as io]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn format-css-class [statekey]
   &quot;Format this statekey, assumed to be a keyword indicating a state in the
@@ -3141,7 +3142,7 @@ net.brehaut.ClojureTools = (function (SH) {
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
-     [:a {:href (format &quot;inspect?x=%d&amp;amp;y=%d&quot; (:x cell) (:y cell))}       
+     [:a {:href (format &quot;inspect?x=%d&amp;y=%d&quot; (:x cell) (:y cell))}       
       [:img {:alt (:state cell) :src (format-image-path state)}]]]))</pre></td></tr><tr><td class="docs"><p>Render this world row as a Hiccup table row.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-row
   [row]
@@ -3151,11 +3152,13 @@ net.brehaut.ClojureTools = (function (SH) {
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                     &quot;resources/public/img/heightmaps/small_hill.png&quot;
+                     (io/get-resource &quot;/img/heightmaps/small_hill.png&quot;)
                      ;; &quot;resources/public/img/heightmaps/great_britain_and_ireland_small.png&quot;)
                    rules/init-rules))
         rules (or (session/get :rules) 
-                  (do (session/put! :rules (compiler/compile-file &quot;resources/rulesets/basic.txt&quot;))
+                  (do (session/put! :rules 
+                                    (compiler/compile-file 
+                                      (io/get-resource &quot;/rulesets/basic.txt&quot;)))
                     (session/get :rules)))
         generation (+ (or (session/get :generation) 0) 1)
         w2 (engine/transform-world world rules)
@@ -3166,22 +3169,17 @@ net.brehaut.ClojureTools = (function (SH) {
       (apply vector
                  (cons :table
                        (map render-world-row w2)))
-      [:p (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the session as a complete HTML page.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn render-world
-  []
-  (html
-   [:html
-    [:head
-     [:title &quot;MicroWorld demo&quot;]
-     [:link {:media &quot;only screen and (max-device-width: 480px)&quot; :href &quot;css/phone.css&quot; :type  &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
-     [:link {:media &quot;only screen and (min-device-width: 481px) and (max-device-width: 1024px)&quot; :href &quot;css/tablet.css&quot; :type &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
-     [:link {:media &quot;screen and (min-device-width: 1025px)&quot; :href &quot;css/standard.css&quot; :type &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
-     [:link {:media &quot;print&quot; :href &quot;css/print.css&quot; :type &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
-     [:link {:href &quot;css/states.css&quot; :type &quot;text/css&quot; :rel &quot;stylesheet&quot;}]
-     [:meta {:http-equiv &quot;refresh&quot; :content &quot;5&quot;}]]
-    [:body
-     (render-world-table)
-     ]]))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.repl" name="mw-ui.repl"><h1 class="project-name">mw-ui.repl</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+      [:p (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn render-inspector
+  [cell table]
+  [:table {:class &quot;music-ruled&quot;}
+   [:tr 
+    [:td {:colspan 2 :style &quot;text-align: center;&quot;} 
+     [:img {:src (str &quot;img/tiles/&quot; (name (:state cell)) &quot;.png&quot;)
+            :width 64
+            :height 64}]]]
+   [:tr [:th &quot;Key&quot;][:th &quot;Value&quot;]]
+   (map #(vector :tr (vector :th %)(vector :td (cell %))) (keys cell))])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.repl" name="mw-ui.repl"><h1 class="project-name">mw-ui.repl</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.repl
   (:use mw-ui.handler
         ring.server.standalone
@@ -3214,16 +3212,40 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.routes.home
   (:use clojure.walk
         compojure.core
+        [mw-engine.utils :as engine-utils]
         [mw-ui.routes.rules :as rules]
         [mw-ui.routes.params :as params])
   (:require [hiccup.core :refer [html]]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
-            [noir.session :as session]))</pre></td></tr><tr><td class="docs">
+            [noir.session :as session]
+            [ring.util.response :as response]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn home-page []
   (layout/render &quot;trusted-content.html&quot; {:title &quot;Welcome to MicroWorld&quot; 
                               :content (util/md-&gt;html &quot;/md/mw-ui.md&quot;)}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn inspect-page [request]
+  (let [params (keywordize-keys (:params request))
+        xs (:x params)
+        ys (:y params)
+        x (if (not (empty? xs)) (read-string xs) 0)
+        y (if (not (empty? ys)) (read-string ys) 0)
+        world (session/get :world)
+        cell (engine-utils/get-cell world x y)
+        state (:state params)]
+    (cond state
+      (do
+        (session/put! :world (engine-utils/set-property world cell :state (keyword state)))
+        (response/redirect &quot;world&quot;))
+      true
+      (layout/render &quot;inspector.html&quot;
+                     {:title (format &quot;Inspect cell at %d, %d&quot; x y)
+                      :content (html (world/render-inspector cell world))
+                      :cell cell
+                      :x (:x cell)
+                      :y (:y cell)
+                      :states (util/list-resources 
+                                &quot;/img/tiles&quot; #&quot;([0-9a-z-_]+).png&quot;)}))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn world-page []
   (layout/render &quot;trusted-content.html&quot; 
                  {:title &quot;Watch your world grow&quot; 
@@ -3250,8 +3272,8 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn docs-page []
   (layout/render &quot;docs.html&quot; {:title &quot;Documentation&quot;
                               :parser (util/md-&gt;html &quot;/md/mw-parser.md&quot; )
-                              :states (util/list-resources &quot;resources/public/img/tiles&quot; #&quot;([0-9a-z-_]+).png&quot;)
-                              :lessons (util/list-resources &quot;resources/public/md/lesson-plans&quot;  #&quot;([0-9a-z-_]+).md&quot;)
+                              :states (util/list-resources &quot;/img/tiles&quot; #&quot;([0-9a-z-_]+).png&quot;)
+                              :lessons (util/list-resources &quot;/md/lesson-plans&quot;  #&quot;([0-9a-z-_]+).md&quot;)
                               :components [&quot;mw-engine&quot; &quot;mw-parser&quot; &quot;mw-ui&quot;]}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defroutes home-routes
   (GET &quot;/&quot; [] (home-page))
@@ -3262,9 +3284,12 @@ net.brehaut.ClojureTools = (function (SH) {
   (GET &quot;/md&quot; request (md-page request))
   (POST &quot;/params&quot; request (params/params-page request))
   (GET &quot;/rules&quot; request (rules/rules-page request))
-  (POST &quot;/rules&quot; request (rules/rules-page request)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.routes.params" name="mw-ui.routes.params"><h1 class="project-name">mw-ui.routes.params</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (POST &quot;/rules&quot; request (rules/rules-page request))
+  (GET &quot;/inspect&quot; request (inspect-page request))
+  (POST &quot;/inspect&quot; request (inspect-page request)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.routes.params" name="mw-ui.routes.params"><h1 class="project-name">mw-ui.routes.params</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.routes.params
   (:use clojure.walk
+        clojure.java.io
         compojure.core)
   (:require [hiccup.core :refer [html]]
             [mw-engine.heightmap :as heightmap]
@@ -3272,12 +3297,13 @@ net.brehaut.ClojureTools = (function (SH) {
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
+            [noir.io :as io]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn- send-params []
   {:title &quot;Choose your world&quot;
-   :heightmaps (util/list-resources &quot;resources/public/img/heightmaps&quot; #&quot;([0-9a-z-_]+).png&quot;)
+   :heightmaps (util/list-resources &quot;/img/heightmaps&quot; #&quot;([0-9a-z-_]+).png&quot;)
    :pause (or (session/get :pause) 5)
-   :rulesets (util/list-resources &quot;resources/rulesets&quot; #&quot;([0-9a-z-_]+).txt&quot;)
+   :rulesets (util/list-resources &quot;/rulesets&quot; #&quot;([0-9a-z-_]+).txt&quot;)
    })</pre></td></tr><tr><td class="docs"><p>Handler for params request. If no <code>request</code> passed, show empty params form.
    If <code>request</code> is passed, put parameters from request into session and show
    the world page.</p>
@@ -3290,15 +3316,15 @@ net.brehaut.ClojureTools = (function (SH) {
             map (:heightmap params)
             pause (:pause params)
             rulefile (:ruleset params)
-            rulepath (str &quot;resources/rulesets/&quot; rulefile &quot;.txt&quot;)]
+            rulepath (str &quot;/rulesets/&quot; rulefile &quot;.txt&quot;)]
         (if (not (= map &quot;&quot;)) 
           (session/put! :world 
                         (heightmap/apply-heightmap 
-                          (str &quot;resources/public/img/heightmaps/&quot; map &quot;.png&quot;))))
+                          (io/get-resource (str &quot;/img/heightmaps/&quot; map &quot;.png&quot;)))))
         (if (not (= rulefile &quot;&quot;))
           (do
-            (session/put! :rule-text (slurp rulepath))
-            (session/put! :rules (compiler/compile-file rulepath))))
+            (session/put! :rule-text (io/slurp-resource rulepath))
+            (session/put! :rules (compiler/compile-file (io/get-resource rulepath)))))
         (if (not (= pause &quot;&quot;))
           (session/put! :pause pause))
         (layout/render &quot;params.html&quot; 
@@ -3323,6 +3349,7 @@ net.brehaut.ClojureTools = (function (SH) {
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
+            [noir.io :as io]
             [noir.session :as session]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn process-rules-request
   [request]
@@ -3337,7 +3364,7 @@ net.brehaut.ClojureTools = (function (SH) {
                            &quot; rules&quot;)           })
           true {:rule-text (or 
                              (session/get :rule-text) 
-                             (slurp &quot;resources/rulesets/basic.txt&quot;))
+                             (io/slurp-resource &quot;/rulesets/basic.txt&quot;))
                 :message &quot;No rules found in request; loading defaults&quot;})
         (catch Exception e 
           {:rule-text src
@@ -3362,6 +3389,7 @@ net.brehaut.ClojureTools = (function (SH) {
     (rules-page nil)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.util" name="mw-ui.util"><h1 class="project-name">mw-ui.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.util
   (:require [noir.io :as io]
+            [noir.session :as session]
             [markdown.core :as md]))</pre></td></tr><tr><td class="docs"><p>reads a markdown file from public/md and returns an HTML string</p>
 </td><td class="codes"><pre class="brush: clojure">(defn md-&gt;html
   [filename]
@@ -3370,8 +3398,11 @@ net.brehaut.ClojureTools = (function (SH) {
     (md/md-to-html-string)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn list-resources [directory pattern]
   &quot;List resource files matching `pattern` in `directory`.&quot;
-  (sort
-    (filter #(not (nil? %)) 
+  (let 
+    [path (str (io/resource-path) directory)]
+    (session/put! :list-resources-path path)
+    (sort
+      (filter #(not (nil? %)) 
             (map #(first (rest (re-matches pattern (.getName %))))
-                 (file-seq (clojure.java.io/file directory))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+                 (file-seq (clojure.java.io/file path)))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

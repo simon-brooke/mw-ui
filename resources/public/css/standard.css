@@ -72,9 +72,10 @@ li.nav-item a:active { background: gray; color: white; }
 }
 
 .widget {
-  margin: 0;
-  padding: 0.25em 1em;
-  border: thin solid white;
+	background-color: silver;
+ 	border: thin solid white;
+ 	margin-top: 0;
+ 	margin-bottom: 0;
 }
 
 .world {
@@ -86,8 +87,6 @@ div.error {
 }
 
 form {
-  width: 100%;
-  background-color: silver;
   border: thin solid silver;
 }
 
@@ -100,7 +99,7 @@ h1, h2, h3, h4, h5 {
   color: white;
 }
 
-p, pre, ul, ol, dl, menu, h1, h2, h3, h4, h5 {
+div.content, form, p, pre, ul, ol, dl, menu, h1, h2, h3, h4, h5 {
   padding: 0.25em 10%;
 }
 
@@ -118,15 +117,8 @@ input.required:after {
 }
 
 label {
-  min-width: 35%;
-}
-
-label, input {
-  padding: 0.25em 1em;
-  margin: 0 0.5em;
-}
-
-label {
+  width: 30em;
+  min-width: 20em;
   border-right: thin solid gray;
 }
 
@@ -138,9 +130,19 @@ menu li::before {
   content: "|| ";
 }
 
-div.world table, div.world tr td {
+div.world table, div.world table tr td {
 	padding: 0;
 	margin: 0;
+	border-collapse: collapse;
 	border: none;
+}
+
+table.music-ruled tr:nth-child(odd) {
+	background-color: silver;
+}
+
+th, td {
+	text-align: left;
+	padding: 0 0.25em;
 }
 

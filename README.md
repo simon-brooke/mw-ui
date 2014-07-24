@@ -1,5 +1,6 @@
 ## What this is about
 
+<img alt="Screenshot" id="screenshot" style="float: left; padding-right: 2em;" src="img/screenshot_med.png"/>
 MicroWorld is a rule driven cellular automaton. What does that mean? Well, it's
 a two dimensional world made up of squares called **cells**. The world develops
 in steps, and at each step, each cell is modified by applying the rules.

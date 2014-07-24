@@ -6,8 +6,8 @@
 ;; Test file specifically to test the helper function in rules handler
 (deftest test-rules-processor
   (testing "Rules processor"
-    (let [request {:src "if state is new and altitude is less than 10 then state should be water"}
+    (let [request {:form-params {:src "if state is new and altitude is less than 10 then state should be water"}}
           response (process-rules-request request)]
       (is (= (:message response) "Successfully compiled 1 rules"))
       (is (= (count (:rules response)) 1))
-      (is (= (:rule-text response) (:src request))))))
+      (is (= (:rule-text response) (:src (:form-params request)))))))
