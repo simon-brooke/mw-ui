@@ -5,6 +5,7 @@
             [mw-engine.natural-rules :as rules]
             [mw-parser.bulk :as compiler]
             [hiccup.core :refer [html]]
+            [noir.io :as io]
             [noir.session :as session]))
 
 
@@ -41,12 +42,14 @@
   (let [world (or (session/get :world)
                   (engine/transform-world
                    (heightmap/apply-heightmap
-                     "resources/public/img/heightmaps/small_hill.png"
+                     (io/get-resource "/img/heightmaps/small_hill.png")
                      ;; "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
                      )
                    rules/init-rules))
         rules (or (session/get :rules) 
-                  (do (session/put! :rules (compiler/compile-file "resources/rulesets/basic.txt"))
+                  (do (session/put! :rules 
+                                    (compiler/compile-file 
+                                      (io/get-resource "/rulesets/basic.txt")))
                     (session/get :rules)))
         generation (+ (or (session/get :generation) 0) 1)
         w2 (engine/transform-world world rules)

@@ -1,5 +1,6 @@
 (ns mw-ui.routes.params
   (:use clojure.walk
+        clojure.java.io
         compojure.core)
   (:require [hiccup.core :refer [html]]
             [mw-engine.heightmap :as heightmap]
@@ -7,13 +8,14 @@
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
+            [noir.io :as io]
             [noir.session :as session]))
 
 (defn- send-params []
   {:title "Choose your world"
-   :heightmaps (util/list-resources "resources/public/img/heightmaps" #"([0-9a-z-_]+).png")
+   :heightmaps (util/list-resources "/img/heightmaps" #"([0-9a-z-_]+).png")
    :pause (or (session/get :pause) 5)
-   :rulesets (util/list-resources "resources/rulesets" #"([0-9a-z-_]+).txt")
+   :rulesets (util/list-resources "/rulesets" #"([0-9a-z-_]+).txt")
    })
 
 (defn params-page 
@@ -28,15 +30,15 @@
             map (:heightmap params)
             pause (:pause params)
             rulefile (:ruleset params)
-            rulepath (str "resources/rulesets/" rulefile ".txt")]
+            rulepath (str "/rulesets/" rulefile ".txt")]
         (if (not (= map "")) 
           (session/put! :world 
                         (heightmap/apply-heightmap 
-                          (str "resources/public/img/heightmaps/" map ".png"))))
+                          (io/get-resource (str "/img/heightmaps/" map ".png")))))
         (if (not (= rulefile ""))
           (do
-            (session/put! :rule-text (slurp rulepath))
-            (session/put! :rules (compiler/compile-file rulepath))))
+            (session/put! :rule-text (io/slurp-resource rulepath))
+            (session/put! :rules (compiler/compile-file (io/get-resource rulepath)))))
         (if (not (= pause ""))
           (session/put! :pause pause))
         (layout/render "params.html" 

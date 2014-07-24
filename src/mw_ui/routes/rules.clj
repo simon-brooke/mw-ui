@@ -6,6 +6,7 @@
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
+            [noir.io :as io]
             [noir.session :as session]))
 
 (defn process-rules-request
@@ -21,7 +22,7 @@
                            " rules")           })
           true {:rule-text (or 
                              (session/get :rule-text) 
-                             (slurp "resources/rulesets/basic.txt"))
+                             (io/slurp-resource "/rulesets/basic.txt"))
                 :message "No rules found in request; loading defaults"})
         (catch Exception e 
           {:rule-text src
