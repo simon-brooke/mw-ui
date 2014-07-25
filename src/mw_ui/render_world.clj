@@ -37,7 +37,7 @@
   (apply vector (cons :tr (map render-cell row))))
 
 (defn render-world-table
-  "Render the world implied by the session as a complete HTML page."
+  "Render the world implied by the current session as a complete HTML table in a DIV."
   []
   (let [world (or (session/get :world)
                   (engine/transform-world
@@ -57,11 +57,11 @@
     (session/put! :world w2)
     (session/put! :generation generation)
     [:div {:class "world"}
-     
       (apply vector
                  (cons :table
                        (map render-world-row w2)))
-      [:p (str "Generation " generation)]]))
+      [:p 
+       (str "Generation " generation)]]))
 
 (defn render-inspector
   [cell table]

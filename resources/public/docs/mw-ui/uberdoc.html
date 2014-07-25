@@ -3146,7 +3146,7 @@ net.brehaut.ClojureTools = (function (SH) {
       [:img {:alt (:state cell) :src (format-image-path state)}]]]))</pre></td></tr><tr><td class="docs"><p>Render this world row as a Hiccup table row.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-row
   [row]
-  (apply vector (cons :tr (map render-cell row))))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the session as a complete HTML page.</p>
+  (apply vector (cons :tr (map render-cell row))))</pre></td></tr><tr><td class="docs"><p>Render the world implied by the current session as a complete HTML table in a DIV.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-table
   []
   (let [world (or (session/get :world)
@@ -3169,7 +3169,8 @@ net.brehaut.ClojureTools = (function (SH) {
       (apply vector
                  (cons :table
                        (map render-world-row w2)))
-      [:p (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs">
+      [:p 
+       (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn render-inspector
   [cell table]
   [:table {:class &quot;music-ruled&quot;}

@@ -3032,8 +3032,8 @@ net.brehaut.ClojureTools = (function (SH) {
 </div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/math.combinatorics</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">org.clojure/tools.trace</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">net.mikera/imagez</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">fivetonine/collage</td><td class="dotted"><hr /></td><td class="dep-version">0.2.1</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-engine.core">mw-engine.core</a></li><li><a href="#mw-engine.heightmap">mw-engine.heightmap</a></li><li><a href="#mw-engine.natural-rules">mw-engine.natural-rules</a></li><li><a href="#mw-engine.utils">mw-engine.utils</a></li><li><a href="#mw-engine.world">mw-engine.world</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.core" name="mw-engine.core"><h1 class="project-name">mw-engine.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to transform a world and run rules.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.core
-  (:require [mw-engine.world :as world]
-            mw-engine.utils))</pre></td></tr><tr><td class="docs"><p>Every rule is a function of two arguments, a cell and a world. If the rule
+  (:use mw-engine.utils)
+  (:require [mw-engine.world :as world]))</pre></td></tr><tr><td class="docs"><p>Every rule is a function of two arguments, a cell and a world. If the rule
 fires, it returns a new cell, which should have the same values for :x and
 :y as the old cell. Anything else can be modified.</p>
 
@@ -3053,13 +3053,14 @@ See <code>world.clj</code>.</p>
 <p>Each time the world is transformed (see <code>transform-world</code>, for each cell, 
 rules are applied in turn until one matches. Once one rule has matched no
 further rules can be applied.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Apply a single rule to a cell. What this is about is that I want to be able,
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Apply a single <code>rule</code> to a <code>cell</code>. What this is about is that I want to be able,
    for debugging purposes, to tag a cell with the rule text of the rule which
    fired (and especially so when an exception is thrown. So a rule may be either
    an ifn, or a list (ifn source-text). This function deals with despatching
-   on those two possibilities.</p>
+   on those two possibilities. <code>world</code> is also passed in in order to be able
+   to access neighbours.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn apply-rule 
-  ([cell world rule]
+  ([world cell rule]
    (cond
      (ifn? rule) (apply-rule cell world rule nil)
      (seq? rule) (let [[afn src] rule] (apply-rule cell world afn src))))
@@ -3067,35 +3068,30 @@ further rules can be applied.</p>
     (let [result (apply rule (list cell world))]
       (cond 
         (and result source) (merge result {:rule source})
-        true result))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules.</p>
+        true result))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this <code>cell</code> of this <code>world</code> by applying these <code>rules</code>.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- apply-rules
-  [cell world rules]
+  [world cell rules]
   (cond (empty? rules) cell
-    true (let [result (apply-rule cell world (first rules))]
+    true (let [result (apply-rule world cell (first rules))]
            (cond result result
-             true (apply-rules cell world (rest rules))))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this cell of this world by applying these rules. If an
-   exception is thrown, cache its message on the cell and set state to error</p>
+             true (apply-rules world cell (rest rules))))))</pre></td></tr><tr><td class="docs"><p>Derive a cell from this <code>cell</code> of this <code>world</code> by applying these <code>rules</code>. If an
+   exception is thrown, cache its message on the cell and set it's state to error</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-cell
-  [cell world rules]
+  [world cell rules]
   (try
     (merge 
-      (apply-rules cell world rules) 
+      (apply-rules world cell rules) 
       {:generation (+ (or (:generation cell) 0) 1)})
     (catch Exception e 
       (merge cell {:error 
                    (format &quot;%s at generation %d when in state %s&quot;
                            (.getMessage e)
                            (:generation cell)
-                           (:state cell))}))))</pre></td></tr><tr><td class="docs"><p>Return a row derived from this row of this world by applying these rules to each cell.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- transform-world-row
-  [row world rules]
-  (apply vector (map #(transform-cell % world rules) row)))</pre></td></tr><tr><td class="docs"><p>Return a world derived from this world by applying these rules to each cell.</p>
+                           (:state cell))
+                   :state :error}))))</pre></td></tr><tr><td class="docs"><p>Return a world derived from this <code>world</code> by applying these <code>rules</code> to each cell.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn transform-world
   [world rules]
-  (apply vector 
-          (map
-            #(transform-world-row % world rules)
-            world)))</pre></td></tr><tr><td class="docs"><p>Consider this single argument as a map of <code>:world</code> and <code>:rules</code>; apply the rules
+  (map-world world transform-cell (list rules)))</pre></td></tr><tr><td class="docs"><p>Consider this single argument as a map of <code>:world</code> and <code>:rules</code>; apply the rules
    to transform the world, and return a map of the new, transformed <code>:world</code> and
    these <code>:rules</code>. As a side effect, print the world.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transform-world-state
@@ -3139,11 +3135,14 @@ ignored). Darker shades are higher.</p>
   (cond (&lt; n 0) (- 0 n) true n))</pre></td></tr><tr><td class="docs"><p>Set the <code>gradient</code> property of this <code>cell</code> of this <code>world</code> to the difference in
    altitude between its highest and lowest neghbours.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn tag-gradient
-  [cell world]
-  (let [heights (map '(:altitude %) (get-neighbours world cell))
-        highest (apply max heights)
-        lowest (apply min heights)]
-    #(merge cell {:gradient (- highest lowest)})))</pre></td></tr><tr><td class="docs"><p>Set the <code>gradient</code> property of each cell in this <code>world</code> to the difference in
+  [world cell]
+  (let [heights (remove nil? (map #(:altitude %) (get-neighbours world cell)))
+        highest (cond (empty? heights) 0 ;; shouldn't happen
+                  true (apply max heights))
+        lowest (cond (empty? heights) 0 ;; shouldn't
+                 true (apply min heights))
+        gradient (- highest lowest)]
+    (merge cell {:gradient gradient})))</pre></td></tr><tr><td class="docs"><p>Set the <code>gradient</code> property of each cell in this <code>world</code> to the difference in
    altitude between its highest and lowest neghbours.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn tag-gradients 
   [world]
@@ -3169,19 +3168,7 @@ ignored). Darker shades are higher.</p>
                     (mod
                       (.getRGB heightmap
                         (get-int cell :x)
-                        (get-int cell :y)) 256))))})))</pre></td></tr><tr><td class="docs"><p>Set the altitude of each cell in this sequence from the corresponding pixel 
-   of this heightmap.
-   If the heightmap you supply is smaller than the world, this will break.</p>
-
-<ul>
-<li><code>row</code> a row in a world, as discussed in world.clj, q.v. Alternatively, a
- sequence of maps;</li>
-<li><code>heightmap</code> an (ideally) greyscale image, whose x and y dimensions should
- exceed those of the world of which the <code>cell</code> forms part.</li>
-</ul>
-</td><td class="codes"><pre class="brush: clojure">(defn- apply-heightmap-row
-  [row heightmap]
-  (apply vector (map #(transform-altitude % heightmap) row)))</pre></td></tr><tr><td class="docs"><p>Apply the image file loaded from this path to this world, and return a world whose
+                        (get-int cell :y)) 256))))})))</pre></td></tr><tr><td class="docs"><p>Apply the image file loaded from this path to this world, and return a world whose
   altitudes are modified (added to) by the altitudes in the heightmap. It is assumed that
   the heightmap is at least as large in x and y dimensions as the world.</p>
 
@@ -3194,14 +3181,14 @@ a world the size of the heightmap will be created.</li>
   ([world imagepath]
   ;; bizarrely, the collage load-util is working for me, but the imagez version isn't.
     (let [heightmap (filter-image (grayscale)(load-image imagepath))]
-      (map-world 
+      (map-world
         (map-world world transform-altitude (list heightmap))
         tag-gradient)))
    ([imagepath]
     (let [heightmap (filter-image (grayscale)(load-image imagepath))
           world (make-world (.getWidth heightmap) (.getHeight heightmap))]
-      (map-world
-        (map-world world transform-altitude (list heightmap))
+      (map-world 
+        (map-world world transform-altitude (list heightmap)) 
         tag-gradient))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
 
 <p>Since the completion of the rule language this is more or less obsolete - 
@@ -3359,7 +3346,7 @@ important.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn in-bounds
   [world x y]
   (and (&gt;= x 0)(&gt;= y 0)(&lt; y (count world))(&lt; x (count (first world)))))</pre></td></tr><tr><td class="docs"><p>Apply this <code>function</code> to each cell in this <code>world</code> to produce a new world.
-   the arguments to the function will be the cell, the world, and any 
+   the arguments to the function will be the world, the cell, and any 
    <code>additional-args</code> supplied</p>
 </td><td class="codes"><pre class="brush: clojure">(defn map-world 
   ([world function]

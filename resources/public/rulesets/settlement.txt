@@ -34,8 +34,9 @@ if state is pasture and fertility is more than 10 and altitude is less than 100 
 
 if state is ploughland then state should be crop
 
-;; after the crop is harvested, the land is allowed to lie fallow
-if state is crop then state should be grassland
+;; after the crop is harvested, the land is allowed to lie fallow. But cropping
+;; depletes fertility.
+if state is crop then state should be grassland and fertility should be fertility - 1
 
 ;; if there's reliable food available, nomads build permanent settlements
 if state is in camp or abandoned and some neighbours are crop then state should be house
@@ -126,3 +127,5 @@ if state is new and altitude is more than 200 then state should be snow
 
 ;; otherwise, we have grassland.
 if state is new then state should be grassland
+	
+	
