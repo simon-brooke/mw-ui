@@ -1,6 +1,6 @@
 (defproject mw-ui "0.1.2-SNAPSHOT"
   :description "Web-based user interface for MicroWorld"
-  :url "http://example.com/FIXME"
+  :url "http://www.journeyman.cc/microworld"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [mw-engine "0.1.2-SNAPSHOT"]
                  [mw-parser "0.1.2-SNAPSHOT"]

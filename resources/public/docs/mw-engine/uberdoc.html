@@ -3136,25 +3136,40 @@ ignored). Darker shades are higher.</p>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn- abs 
   [n]
-  (cond (&lt; n 0) (- 0 n) true n))</pre></td></tr><tr><td class="docs"><p>Set the altitude of this cell from the corresponding pixel of this heightmap.
+  (cond (&lt; n 0) (- 0 n) true n))</pre></td></tr><tr><td class="docs"><p>Set the <code>gradient</code> property of this <code>cell</code> of this <code>world</code> to the difference in
+   altitude between its highest and lowest neghbours.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn tag-gradient
+  [cell world]
+  (let [heights (map '(:altitude %) (get-neighbours world cell))
+        highest (apply max heights)
+        lowest (apply min heights)]
+    #(merge cell {:gradient (- highest lowest)})))</pre></td></tr><tr><td class="docs"><p>Set the <code>gradient</code> property of each cell in this <code>world</code> to the difference in
+   altitude between its highest and lowest neghbours.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn tag-gradients 
+  [world]
+  (map-world world tag-gradient))</pre></td></tr><tr><td class="docs"><p>Set the altitude of this cell from the corresponding pixel of this heightmap.
    If the heightmap you supply is smaller than the world, this will break.</p>
 
 <ul>
+<li><code>world</code> not actually used, but present to enable this function to be
+ passed as an argument to <code>mw-engine.utils/map-world</code>, q.v.</li>
 <li><code>cell</code> a cell, as discussed in world.clj, q.v. Alternatively, a map;</li>
 <li><code>heightmap</code> an (ideally) greyscale image, whose x and y dimensions should
  exceed those of the world of which the <code>cell</code> forms part.</li>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn transform-altitude
-  [cell heightmap]
-  (merge cell
-         {:altitude
-          (+ (get-int cell :altitude)
-           (- 256
-              (abs
-               (mod
-                (.getRGB heightmap
-                         (get-int cell :x)
-                         (get-int cell :y)) 256))))}))</pre></td></tr><tr><td class="docs"><p>Set the altitude of each cell in this sequence from the corresponding pixel 
+  ([world cell heightmap]
+    (transform-altitude cell heightmap))
+  ([cell heightmap]
+    (merge cell
+           {:altitude
+            (+ (get-int cell :altitude)
+               (- 256
+                  (abs
+                    (mod
+                      (.getRGB heightmap
+                        (get-int cell :x)
+                        (get-int cell :y)) 256))))})))</pre></td></tr><tr><td class="docs"><p>Set the altitude of each cell in this sequence from the corresponding pixel 
    of this heightmap.
    If the heightmap you supply is smaller than the world, this will break.</p>
 
@@ -3179,11 +3194,15 @@ a world the size of the heightmap will be created.</li>
   ([world imagepath]
   ;; bizarrely, the collage load-util is working for me, but the imagez version isn't.
     (let [heightmap (filter-image (grayscale)(load-image imagepath))]
-      (apply vector (map #(apply-heightmap-row % heightmap) world))))
-  ([imagepath]
+      (map-world 
+        (map-world world transform-altitude (list heightmap))
+        tag-gradient)))
+   ([imagepath]
     (let [heightmap (filter-image (grayscale)(load-image imagepath))
           world (make-world (.getWidth heightmap) (.getHeight heightmap))]
-      (apply vector (map #(apply-heightmap-row % heightmap) world)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
+      (map-world
+        (map-world world transform-altitude (list heightmap))
+        tag-gradient))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
 
 <p>Since the completion of the rule language this is more or less obsolete - 
 there are still a few things that you can do with rules written in Clojure
@@ -3339,7 +3358,18 @@ important.</p>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn in-bounds
   [world x y]
-  (and (&gt;= x 0)(&gt;= y 0)(&lt; y (count world))(&lt; x (count (first world)))))</pre></td></tr><tr><td class="docs"><p>Return the cell a x, y in this world, if any.</p>
+  (and (&gt;= x 0)(&gt;= y 0)(&lt; y (count world))(&lt; x (count (first world)))))</pre></td></tr><tr><td class="docs"><p>Apply this <code>function</code> to each cell in this <code>world</code> to produce a new world.
+   the arguments to the function will be the cell, the world, and any 
+   <code>additional-args</code> supplied</p>
+</td><td class="codes"><pre class="brush: clojure">(defn map-world 
+  ([world function]
+    (map-world world function nil))
+  ([world function additional-args]
+    (apply vector ;; vectors are more efficient for scanning, which we do a lot.
+         (for [row world]
+           (apply vector 
+                  (map #(apply function (cons world (cons % additional-args))) 
+                       row))))))</pre></td></tr><tr><td class="docs"><p>Return the cell a x, y in this world, if any.</p>
 
 <ul>
 <li><code>world</code> a world as defined above;</li>
