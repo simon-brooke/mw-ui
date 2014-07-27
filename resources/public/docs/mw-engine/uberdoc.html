@@ -3029,7 +3029,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>mw-engine -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">mw-engine</h1><h2 class="project-version">0.1.2-SNAPSHOT</h2><br /><p>Cellular automaton world builder.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/math.combinatorics</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">org.clojure/tools.trace</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">net.mikera/imagez</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">fivetonine/collage</td><td class="dotted"><hr /></td><td class="dep-version">0.2.1</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-engine.core">mw-engine.core</a></li><li><a href="#mw-engine.heightmap">mw-engine.heightmap</a></li><li><a href="#mw-engine.natural-rules">mw-engine.natural-rules</a></li><li><a href="#mw-engine.utils">mw-engine.utils</a></li><li><a href="#mw-engine.world">mw-engine.world</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.core" name="mw-engine.core"><h1 class="project-name">mw-engine.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to transform a world and run rules.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">org.clojure/math.combinatorics</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">org.clojure/tools.trace</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">net.mikera/imagez</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#mw-engine.core">mw-engine.core</a></li><li><a href="#mw-engine.heightmap">mw-engine.heightmap</a></li><li><a href="#mw-engine.manifest">mw-engine.manifest</a></li><li><a href="#mw-engine.natural-rules">mw-engine.natural-rules</a></li><li><a href="#mw-engine.utils">mw-engine.utils</a></li><li><a href="#mw-engine.world">mw-engine.world</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.core" name="mw-engine.core"><h1 class="project-name">mw-engine.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Functions to transform a world and run rules.</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-engine.core
   (:use mw-engine.utils)
@@ -3118,11 +3118,8 @@ ignored). Darker shades are higher.</p>
   (:import [java.awt.image BufferedImage])
   (:use mw-engine.utils
         mw-engine.world
-        ;; interestingly the imagez load-image is failing for me, while the
-        ;; collage version is problem free.
-        [mikera.image.core :only [filter-image get-pixels]]
-        [mikera.image.filters]
-        [fivetonine.collage.util]))</pre></td></tr><tr><td class="docs"><p>Surprisingly, Clojure doesn't seem to have an abs function, or else I've 
+        [mikera.image.core :only [load-image filter-image get-pixels]]
+        [mikera.image.filters]))</pre></td></tr><tr><td class="docs"><p>Surprisingly, Clojure doesn't seem to have an abs function, or else I've 
    missed it. So here's one of my own. Maps natural numbers onto themselves,
    and negative integers onto natural numbers. Also maps negative real numbers
    onto positive real numbers.</p>
@@ -3156,9 +3153,9 @@ ignored). Darker shades are higher.</p>
 <li><code>heightmap</code> an (ideally) greyscale image, whose x and y dimensions should
  exceed those of the world of which the <code>cell</code> forms part.</li>
 </ul>
-</td><td class="codes"><pre class="brush: clojure">(defn transform-altitude
+</td><td class="codes"><pre class="brush: clojure">(defn tag-altitude
   ([world cell heightmap]
-    (transform-altitude cell heightmap))
+    (tag-altitude cell heightmap))
   ([cell heightmap]
     (merge cell
            {:altitude
@@ -3179,17 +3176,28 @@ a world the size of the heightmap will be created.</li>
 </ul>
 </td><td class="codes"><pre class="brush: clojure">(defn apply-heightmap
   ([world imagepath]
-  ;; bizarrely, the collage load-util is working for me, but the imagez version isn't.
     (let [heightmap (filter-image (grayscale)(load-image imagepath))]
       (map-world
-        (map-world world transform-altitude (list heightmap))
+        (map-world world tag-altitude (list heightmap))
         tag-gradient)))
    ([imagepath]
     (let [heightmap (filter-image (grayscale)(load-image imagepath))
           world (make-world (.getWidth heightmap) (.getHeight heightmap))]
       (map-world 
-        (map-world world transform-altitude (list heightmap)) 
-        tag-gradient))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
+        (map-world world tag-altitude (list heightmap)) 
+        tag-gradient))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.manifest" name="mw-engine.manifest"><h1 class="project-name">mw-engine.manifest</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>manifest.clj: a mechanism </p>
+</td><td class="codes"><pre class="brush: clojure">(ns mw-engine.manifest)</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def manifest {
+             :build-signature {
+                               :build-signture-version &quot;0.1.2-SNAPSHOT&quot;
+                               :build-signature-user &quot;unset&quot;
+                               :build-signature-email &quot;unset&quot;
+                               :build-signature-timestamp &quot;unset&quot;
+             ;; NOTE: it's important that the closing brace not be on the same
+             ;; line as the build-signature fields, because of how the buildall 
+             ;; script constructs the build signature.
+             }
+             })</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-engine.natural-rules" name="mw-engine.natural-rules"><h1 class="project-name">mw-engine.natural-rules</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A set of MicroWorld rules describing a simplified natural ecosystem.</p>
 
 <p>Since the completion of the rule language this is more or less obsolete - 
 there are still a few things that you can do with rules written in Clojure

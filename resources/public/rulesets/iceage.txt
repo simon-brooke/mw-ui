@@ -1,7 +1,9 @@
 ## Ruleset which attempts to model retreat of ice after an iceage
 
 ;; Limitations: because the rule language doesn't (yet) allow sophisticated
-;; arithmetic, the ice retreats north to south (southern hemisphere).
+;; arithmetic, the ice retreats north to south (southern hemisphere). Otherwise,
+;; it's pretty realistic; ice moves progressively up hillsides, and vegetation
+;; gradually re-establishes.
 
 ## Vegetation rules
 ;; rules which populate the world with plants
@@ -55,9 +57,9 @@ if state is new then state should be ice
 ;; just a hack because I can't do complex arithmetic in rules)
 ;; below the waterline ice thaws to water.
 if state is ice and generation is more than y and altitude is less than 10 then state should be water
+
 ;; otherwise it thaws to snow
 if state is ice and generation is more than y then state should be snow
 
 ;; thaw moves gradually up the hills
-
 if state is snow and generation is more than altitude then state should be waste

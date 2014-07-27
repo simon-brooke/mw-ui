@@ -1,24 +1,50 @@
+# Human settlement
+
+;; This rule set attempts to model human settlement in a landscape. It models
+;; western European pre-history moderately well. Settlement first occurs as
+;; nomadic camps on coastal promentaries (cells with four or more neighbours
+;; that are water). This represents 'kitchen-midden' mesolithic settlement.
+;;
+;; As grassland becomes available near camps, pastoralists appear, and will 
+;; follow their herds inland. When pastoralists have available fertile land,
+;; they will till the soil and plant crops, and in doing so will establish
+;; permanent settlements; this is approximately a neolithic stage.
+;;
+;; Where soil is fertile, settlements will cluster, and markets will appear.
+;; where there is sufficient settlement, the markets become permanent, and you
+;; have the appearance of towns. This takes us roughly into the bronze age.
+;;
+;; This is quite a complex ruleset, and runs quite slowly. However, it does
+;; model some significant things. Soil gains in fertility under woodland; deep
+;; loams and podzols build up over substantial time. Agriculture depletes 
+;; fertility. So if forest has become well established before human settlement
+;; begins, a higher population (more crops) will eventually be sustainable,
+;; whereas if human population starts early the deep fertile soils will not 
+;; establish and you will have more pastoralism, supporting fewer permanent
+;; settlements.
+
 ;; hack to speed up processing on the 'great britain and ireland' map
 if state is water then state should be water
-
-# Human settlement
 
 ;; nomads make their first significant camp near water because of fish and
 ;; shellfish (kitchen-midden people)
 if state is in grassland or heath and more than 3 neighbours are water and generation is more than 20 then state should be camp
 
 ;; sooner or later nomads learn to keep flocks
-if state is in grassland or heath and some neighbours are camp then state should be pasture
+if state is in grassland or heath and some neighbours are camp then 1 chance in 2 state should be pasture
 
 ;; and more herds support more people
-if state is in grassland or heath and more than 2 neighbours are pasture then state should be camp
+if state is in grassland or heath and more than 2 neighbours are pasture then 1 chance in 3 state should be camp
 if state is pasture and more than 3 neighbours are pasture and fewer than 1 neighbours are camp and fewer than 1 neighbours within 2 are house then state should be camp
 
 ;; the idea of agriculture spreads
-if state is in grassland or heath and some neighbours within 3 are house then state should be pasture
+if state is in grassland or heath and some neighbours within 2 are house then state should be pasture
 
 ;; nomads don't move on while the have crops growing. That would be silly!
 if state is camp and some neighbours are ploughland then state should be camp
+
+;; Impoverished pasture can't be grazed permanently
+if state is pasture and fertility is less than 2 then 1 chance in 3 state should be heath
 
 ;; nomads move on
 if state is camp then 1 chance in 5 state should be waste
@@ -127,5 +153,4 @@ if state is new and altitude is more than 200 then state should be snow
 
 ;; otherwise, we have grassland.
 if state is new then state should be grassland
-	
 	
