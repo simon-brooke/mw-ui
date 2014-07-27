@@ -1,7 +1,9 @@
 (ns mw-ui.repl
   (:use mw-ui.handler
         ring.server.standalone
-        [ring.middleware file-info file]))
+        [ring.middleware file-info file])
+  (:gen-class)
+)
 
 (defonce server (atom nil))
 
@@ -32,3 +34,6 @@
 (defn stop-server []
   (.stop @server)
   (reset! server nil))
+
+(defn -main []
+  (start-server))
