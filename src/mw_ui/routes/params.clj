@@ -34,7 +34,7 @@
         (if (not (= map "")) 
           (session/put! :world 
                         (heightmap/apply-heightmap 
-                          (io/get-resource (str "/img/heightmaps/" map ".png")))))
+                          (as-file (str "/img/heightmaps/" map ".png")))))
         (if (not (= rulefile ""))
           (do
             (session/put! :rule-text (io/slurp-resource rulepath))

@@ -3120,10 +3120,10 @@ net.brehaut.ClojureTools = (function (SH) {
   (concat (when (env :dev) development-middleware)
           production-middleware))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#mw-ui.render-world" name="mw-ui.render-world"><h1 class="project-name">mw-ui.render-world</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns mw-ui.render-world
-  (:require [mw-engine.core :as engine]
+  (:require [clojure.java.io :as jio]
+            [mw-engine.core :as engine]
             [mw-engine.world :as world]
             [mw-engine.heightmap :as heightmap]
-            [mw-engine.natural-rules :as rules]
             [mw-parser.bulk :as compiler]
             [hiccup.core :refer [html]]
             [noir.io :as io]
@@ -3150,11 +3150,8 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-table
   []
   (let [world (or (session/get :world)
-                  (engine/transform-world
-                   (heightmap/apply-heightmap
-                     (io/get-resource &quot;/img/heightmaps/small_hill.png&quot;)
-                     ;; &quot;resources/public/img/heightmaps/great_britain_and_ireland_small.png&quot;)
-                   rules/init-rules))
+                  (heightmap/apply-heightmap 
+                      (io/get-resource &quot;/img/heightmaps/small_hill.png&quot;)))
         rules (or (session/get :rules) 
                   (do (session/put! :rules 
                                     (compiler/compile-file 
@@ -3324,7 +3321,7 @@ net.brehaut.ClojureTools = (function (SH) {
         (if (not (= map &quot;&quot;)) 
           (session/put! :world 
                         (heightmap/apply-heightmap 
-                          (io/get-resource (str &quot;/img/heightmaps/&quot; map &quot;.png&quot;)))))
+                          (as-file (str &quot;/img/heightmaps/&quot; map &quot;.png&quot;)))))
         (if (not (= rulefile &quot;&quot;))
           (do
             (session/put! :rule-text (io/slurp-resource rulepath))

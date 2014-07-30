@@ -1,8 +1,8 @@
 (ns mw-ui.render-world
-  (:require [mw-engine.core :as engine]
+  (:require [clojure.java.io :as jio]
+            [mw-engine.core :as engine]
             [mw-engine.world :as world]
             [mw-engine.heightmap :as heightmap]
-            [mw-engine.natural-rules :as rules]
             [mw-parser.bulk :as compiler]
             [hiccup.core :refer [html]]
             [noir.io :as io]
@@ -40,12 +40,8 @@
   "Render the world implied by the current session as a complete HTML table in a DIV."
   []
   (let [world (or (session/get :world)
-                  (engine/transform-world
-                   (heightmap/apply-heightmap
-                     (io/get-resource "/img/heightmaps/small_hill.png")
-                     ;; "resources/public/img/heightmaps/great_britain_and_ireland_small.png"
-                     )
-                   rules/init-rules))
+                  (heightmap/apply-heightmap 
+                      (io/get-resource "/img/heightmaps/small_hill.png")))
         rules (or (session/get :rules) 
                   (do (session/put! :rules 
                                     (compiler/compile-file 
