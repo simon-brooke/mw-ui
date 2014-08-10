@@ -28,7 +28,7 @@
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
-     [:a {:href (format "inspect?x=%d&y=%d" (:x cell) (:y cell))}       
+     [:a {:href (format "inspect?x=%d&y=%d" (:x cell) (:y cell))}
       [:img {:alt (:state cell) :src (format-image-path state)}]]]))
 
 (defn render-world-row
@@ -40,11 +40,11 @@
   "Render the world implied by the current session as a complete HTML table in a DIV."
   []
   (let [world (or (session/get :world)
-                  (heightmap/apply-heightmap 
+                  (heightmap/apply-heightmap
                       (io/get-resource "/img/heightmaps/small_hill.png")))
-        rules (or (session/get :rules) 
-                  (do (session/put! :rules 
-                                    (compiler/compile-file 
+        rules (or (session/get :rules)
+                  (do (session/put! :rules
+                                    (compiler/compile-file
                                       (io/get-resource "/rulesets/basic.txt")))
                     (session/get :rules)))
         generation (+ (or (session/get :generation) 0) 1)
@@ -56,14 +56,15 @@
       (apply vector
                  (cons :table
                        (map render-world-row w2)))
-      [:p 
+      [:p
        (str "Generation " generation)]]))
 
 (defn render-inspector
+  "Render in Hiccup format the HTML content of an inspector on this cell."
   [cell table]
   [:table {:class "music-ruled"}
-   [:tr 
-    [:td {:colspan 2 :style "text-align: center;"} 
+   [:tr
+    [:td {:colspan 2 :style "text-align: center;"}
      [:img {:src (str "img/tiles/" (name (:state cell)) ".png")
             :width 64
             :height 64}]]]
@@ -71,4 +72,3 @@
    (map #(vector :tr (vector :th %)(vector :td (cell %))) (keys cell))])
 
 
-  
