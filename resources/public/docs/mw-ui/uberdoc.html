@@ -3142,7 +3142,7 @@ net.brehaut.ClojureTools = (function (SH) {
   [cell]
   (let [state (:state cell)]
     [:td {:class (format-css-class state) :title (format-mouseover cell)}
-     [:a {:href (format &quot;inspect?x=%d&amp;y=%d&quot; (:x cell) (:y cell))}       
+     [:a {:href (format &quot;inspect?x=%d&amp;y=%d&quot; (:x cell) (:y cell))}
       [:img {:alt (:state cell) :src (format-image-path state)}]]]))</pre></td></tr><tr><td class="docs"><p>Render this world row as a Hiccup table row.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-row
   [row]
@@ -3150,14 +3150,14 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn render-world-table
   []
   (let [world (or (session/get :world)
-                  (heightmap/apply-heightmap 
+                  (heightmap/apply-heightmap
                       (io/get-resource &quot;/img/heightmaps/small_hill.png&quot;)))
-        rules (or (session/get :rules) 
-                  (do (session/put! :rules 
-                                    (compiler/compile-file 
+        rules (or (session/get :rules)
+                  (do (session/put! :rules
+                                    (compiler/compile-file
                                       (io/get-resource &quot;/rulesets/basic.txt&quot;)))
                     (session/get :rules)))
-        generation (+ (or (session/get :generation) 0) 1)
+        generation (inc (or (session/get :generation) 0))
         w2 (engine/transform-world world rules)
         ]
     (session/put! :world w2)
@@ -3166,13 +3166,13 @@ net.brehaut.ClojureTools = (function (SH) {
       (apply vector
                  (cons :table
                        (map render-world-row w2)))
-      [:p 
-       (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs">
+      [:p
+       (str &quot;Generation &quot; generation)]]))</pre></td></tr><tr><td class="docs"><p>Render in Hiccup format the HTML content of an inspector on this cell.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn render-inspector
   [cell table]
   [:table {:class &quot;music-ruled&quot;}
-   [:tr 
-    [:td {:colspan 2 :style &quot;text-align: center;&quot;} 
+   [:tr
+    [:td {:colspan 2 :style &quot;text-align: center;&quot;}
      [:img {:src (str &quot;img/tiles/&quot; (name (:state cell)) &quot;.png&quot;)
             :width 64
             :height 64}]]]
@@ -3229,8 +3229,8 @@ net.brehaut.ClojureTools = (function (SH) {
   (let [params (keywordize-keys (:params request))
         xs (:x params)
         ys (:y params)
-        x (if (not (empty? xs)) (read-string xs) 0)
-        y (if (not (empty? ys)) (read-string ys) 0)
+        x (if (seq xs) (read-string xs) 0)
+        y (if (seq ys) (read-string ys) 0)
         world (session/get :world)
         cell (engine-utils/get-cell world x y)
         state (:state params)]
@@ -3267,7 +3267,7 @@ net.brehaut.ClojureTools = (function (SH) {
                     :content (util/md-&gt;html (str &quot;/md/&quot; content))})))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn list-states []
   (sort
-    (filter #(not (nil? %)) 
+    (remove nil?
             (map #(first (rest (re-matches #&quot;([0-9a-z-]+).png&quot; (.getName %))))
                  (file-seq (clojure.java.io/file &quot;resources/public/img/tiles&quot;))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn docs-page []
@@ -3318,15 +3318,14 @@ net.brehaut.ClojureTools = (function (SH) {
             pause (:pause params)
             rulefile (:ruleset params)
             rulepath (str &quot;/rulesets/&quot; rulefile &quot;.txt&quot;)]
-        (if (not (= map &quot;&quot;)) 
+        (if (not= map &quot;&quot;) 
           (session/put! :world 
                         (heightmap/apply-heightmap 
                           (io/get-resource (str &quot;/img/heightmaps/&quot; map &quot;.png&quot;)))))
-        (if (not (= rulefile &quot;&quot;))
-          (do
-            (session/put! :rule-text (io/slurp-resource rulepath))
-            (session/put! :rules (compiler/compile-file (io/get-resource rulepath)))))
-        (if (not (= pause &quot;&quot;))
+        (when (not= rulefile &quot;&quot;)
+          (session/put! :rule-text (io/slurp-resource rulepath))
+          (session/put! :rules (compiler/compile-file (io/get-resource rulepath))))
+        (if (not= pause &quot;&quot;)
           (session/put! :pause pause))
         (layout/render &quot;params.html&quot; 
                        (merge (send-params) 
@@ -3404,7 +3403,7 @@ net.brehaut.ClojureTools = (function (SH) {
     [path (str (io/resource-path) directory)]
     (session/put! :list-resources-path path)
     (sort
-      (filter #(not (nil? %)) 
+      (remove nil? 
             (map #(first (rest (re-matches pattern (.getName %))))
                  (file-seq (clojure.java.io/file path)))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

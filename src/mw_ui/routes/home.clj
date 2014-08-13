@@ -19,8 +19,8 @@
   (let [params (keywordize-keys (:params request))
         xs (:x params)
         ys (:y params)
-        x (if (not (empty? xs)) (read-string xs) 0)
-        y (if (not (empty? ys)) (read-string ys) 0)
+        x (if (seq xs) (read-string xs) 0)
+        y (if (seq ys) (read-string ys) 0)
         world (session/get :world)
         cell (engine-utils/get-cell world x y)
         state (:state params)]
@@ -61,7 +61,7 @@
 
 (defn list-states []
   (sort
-    (filter #(not (nil? %)) 
+    (remove nil?
             (map #(first (rest (re-matches #"([0-9a-z-]+).png" (.getName %))))
                  (file-seq (clojure.java.io/file "resources/public/img/tiles"))))))
 

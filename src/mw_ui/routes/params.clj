@@ -31,15 +31,14 @@
             pause (:pause params)
             rulefile (:ruleset params)
             rulepath (str "/rulesets/" rulefile ".txt")]
-        (if (not (= map "")) 
+        (if (not= map "") 
           (session/put! :world 
                         (heightmap/apply-heightmap 
                           (io/get-resource (str "/img/heightmaps/" map ".png")))))
-        (if (not (= rulefile ""))
-          (do
-            (session/put! :rule-text (io/slurp-resource rulepath))
-            (session/put! :rules (compiler/compile-file (io/get-resource rulepath)))))
-        (if (not (= pause ""))
+        (when (not= rulefile "")
+          (session/put! :rule-text (io/slurp-resource rulepath))
+          (session/put! :rules (compiler/compile-file (io/get-resource rulepath))))
+        (if (not= pause "")
           (session/put! :pause pause))
         (layout/render "params.html" 
                        (merge (send-params) 

@@ -3115,7 +3115,7 @@ front of the sequence of tokens it returns nil.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Parse a number.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-numeric-value
   [[value &amp; remainder]]
-  (if (re-matches re-number value) [(read-string value) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell, 
+  (if (and value (re-matches re-number value)) [(read-string value) remainder]))</pre></td></tr><tr><td class="docs"><p>Parse a token assumed to be the name of a property of the current cell, 
   whose value is assumed to be an integer.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn parse-property-int
   [[value &amp; remainder]]
@@ -3217,7 +3217,7 @@ front of the sequence of tokens it returns nil.</p>
         comparator (cond (= MORE &quot;more&quot;) '&gt;
                      (member? MORE '(&quot;fewer&quot; &quot;less&quot;)) '&lt;)]       
     (cond
-      (not (= WITHIN &quot;within&quot;))
+      (not= WITHIN &quot;within&quot;)
       (parse-comparator-neighbours-condition 
         (flatten 
           ;; two tokens were mis-parsed as 'within distance' that weren't
@@ -3256,7 +3256,7 @@ front of the sequence of tokens it returns nil.</p>
     (cond
       (and quantity (= NEIGHBOURS &quot;neighbours&quot;))
       (cond
-        (not (= WITHIN &quot;within&quot;))
+        (not= WITHIN &quot;within&quot;)
         (parse-simple-neighbours-condition
           (flatten 
             ;; two tokens were mis-parsed as 'within distance' that weren't
@@ -3325,7 +3325,7 @@ front of the sequence of tokens it returns nil.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- parse-arithmetic-action 
   [previous [prop1 SHOULD BE prop2 operator value &amp; rest]]
   (cond
-    (member? prop2 '(&quot;x&quot; &quot;y&quot;))
+    (member? prop1 '(&quot;x&quot; &quot;y&quot;))
     (throw 
       (Exception. reserved-properties-error))
     (and (= SHOULD &quot;should&quot;)
