@@ -1,0 +1,16 @@
+{% extends "templates/base.html" %}
+{% block content %}
+
+<p>This form allows you to upload a file. It should be a file saved by MicroWorld, or is probably won't work.</p>
+<form action="/load" enctype="multipart/form-data" method="POST">
+    <p class="widget">
+		<label for="file">The file to upload</label>
+        <input id="file" name="file" type="file" />
+    </p>
+    <p class="widget">
+		<label for="submit">When you are ready</label>
+        <input type="submit" id="submit" value="upload" />
+    </p>
+</form>
+
+{% endblock %}
