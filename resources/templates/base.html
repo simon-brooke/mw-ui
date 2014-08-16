@@ -23,9 +23,11 @@
       <img id="nav-icon" src="{{servlet-context}}/img/threelines.png" alt="Menu"/>
       <ul id="nav-menu" class="nav">
         <li class="{{home-selected}}"><a href="{{servlet-context}}/">Home</a></li>
+        <li class="{{world-selected}}"><a href="{{servlet-context}}/world">World</a></li>
         <li class="{{params-selected}}"><a href="{{servlet-context}}/params">Parameters</a></li>
         <li class="{{rules-selected}}"><a href="{{servlet-context}}/rules">Rules</a></li>
-        <li class="{{world-selected}}"><a href="{{servlet-context}}/world">World</a></li>
+        <li class="{{save-selected}} nav-optional"><a href="{{servlet-context}}/saved-map.mwm">Save</a></li>
+        <li class="{{load-selected}} nav-optional"><a href="{{servlet-context}}/load">Load</a></li>
         <li class="{{about-selected}}"><a href="{{servlet-context}}/about">About</a></li>
         <li class="{{docs-selected}}"><a href="{{servlet-context}}/docs">Documentation</a></li>
       </ul>
@@ -37,12 +39,12 @@
 
     <div id="main-container" class="container">
 	  {% if message %}
-		<div id="announcement">
+		<div id="message">
 			<p class="message">{{message}}</p>
 		</div>
 	  {% endif %}
 	  {% if error %}
-		<div id="announcement">
+		<div id="error">
 			<p class="error">{{error}}</p>
 		</div>
 	  {% endif %}

@@ -37,7 +37,7 @@ body {
 #nav:hover #nav-menu {
 	display: inline;
 }
-	
+
 #nav-icon {
   padding: 0.25em;
 }
@@ -52,7 +52,7 @@ body {
   display: inline;
 }
 
-#nav ul li a { 
+#nav ul li a {
   color: white;
   text-decoration: none;
   font-weight: bold;
@@ -66,6 +66,12 @@ li.nav-item a:active { background: gray; color: white; }
 .error {
     background-color: red;
     color: white;
+}
+
+/* there isn't enough room on a phone display for optional elements, and
+  load/save isn't going to work on a phone anyway */
+.nav-optional {
+  display: none;
 }
 
 .widget {

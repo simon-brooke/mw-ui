@@ -6,7 +6,7 @@ body {
 /* Overall container div, holds all content of page. Yes, I know it shouldn't have fixed width */
 #main-container{
   clear: both;
-  width:100%;
+/*  width:100%; */
 }
 
 /* footer of the document */
@@ -54,7 +54,7 @@ body {
   display: inline;
 }
 
-#nav ul li a { 
+#nav ul li a {
   color: white;
   text-decoration: none;
   font-weight: bold;
