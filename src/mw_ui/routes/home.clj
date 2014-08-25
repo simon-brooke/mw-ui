@@ -46,8 +46,8 @@
   (let [params (keywordize-keys (:params request))
         xs (:x params)
         ys (:y params)
-        x (if (not (empty? xs)) (read-string xs) 0)
-        y (if (not (empty? ys)) (read-string ys) 0)
+        x (if (seq xs) (read-string xs) 0)
+        y (if (seq ys) (read-string ys) 0)
         world (session/get :world)
         cell (engine-utils/get-cell world x y)
         state (:state params)]
@@ -83,6 +83,7 @@
                  :content (html (world/render-world-table))
                  :pause (or (session/get :pause) 5)
                  :maybe-refresh "refresh"}))
+
 
 (defroutes home-routes
   (GET  "/" [] (home-page))

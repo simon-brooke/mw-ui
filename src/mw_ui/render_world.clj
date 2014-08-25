@@ -47,7 +47,7 @@
                                     (compiler/compile-file
                                       (io/get-resource "/rulesets/basic.txt")))
                     (session/get :rules)))
-        generation (+ (or (session/get :generation) 0) 1)
+        generation (inc (or (session/get :generation) 0))
         w2 (engine/transform-world world rules)
         ]
     (session/put! :world w2)

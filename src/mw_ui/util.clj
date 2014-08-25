@@ -16,6 +16,6 @@
     [path (str (io/resource-path) directory)]
     (session/put! :list-resources-path path)
     (sort
-      (filter #(not (nil? %)) 
+      (remove nil? 
             (map #(first (rest (re-matches pattern (.getName %))))
                  (file-seq (clojure.java.io/file path)))))))
