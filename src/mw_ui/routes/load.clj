@@ -4,7 +4,9 @@
   (:require [hiccup.core :refer [html]]
             [noir.io :as io]
             [noir.session :as session]
-            [ring.util.response :as response]))
+            [ring.util.response :as response]
+            [mw-ui.layout :as layout]
+            ))
 
 
 (defn- upload [file]
