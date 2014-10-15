@@ -1,3 +1,13 @@
+/target
+/lib
+/classes
+/checkouts
+pom.xml
+*.jar
+*.class
+/.lein-*
+/.env
+*.log
 
 # Links to other places:
 resources/public/docs/mw-*/uberdoc.html
