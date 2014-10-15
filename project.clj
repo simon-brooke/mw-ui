@@ -1,4 +1,4 @@
-(defproject mw-ui "0.1.4-SNAPSHOT"
+(defproject mw-ui "0.1.4"
   :description "Web-based user interface for MicroWorld"
   :url "http://www.journeyman.cc/microworld"
   :manifest {
@@ -9,8 +9,8 @@
              "Implementation-Version" "unset"
              }
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [mw-engine "0.1.4-SNAPSHOT"]
-                 [mw-parser "0.1.4-SNAPSHOT"]
+                 [mw-engine "0.1.4"]
+                 [mw-parser "0.1.4"]
                  [lib-noir "0.8.4"]
                  [ring-server "0.3.1"]
                  [selmer "0.6.8"]
