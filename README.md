@@ -1,13 +1,18 @@
-## Part of the overall Microworld system 
+## Part of the overall MicroWorld system 
 
 *mw-ui* is not a stand-alone project. To use it you also need at least
 [mw-parser](https://github.com/simon-brooke/mw-parser) and 
 [mw-engine](https://github.com/simon-brooke/mw-engine). There will be other 
 modules in due course.
 
+You can see MicroWorld in action [here](http://www.journeyman.cc/microworld/) -
+but please don't be mean to my poor little server. If you want to run big maps
+or complex rule-sets, please run it on your own machines.
+
 ## What this is about
 
-<img alt="Screenshot" id="screenshot" style="float: left; padding-right: 2em;" src="img/screenshot_med.png"/>
+<img alt="Screenshot" id="screenshot" alt="MicroWrold in action"
+	style="float: left; padding-right: 2em;" src="img/screenshot_med.png"/>
 MicroWorld is a rule driven cellular automaton. What does that mean? Well, it's
 a two dimensional world made up of squares called **cells**. The world develops
 in steps, and at each step, each cell is modified by applying the rules.
