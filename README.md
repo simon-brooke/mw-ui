@@ -1,3 +1,10 @@
+## Part of the overall Microworld system 
+
+*mw-ui* is not a stand-alone project. To use it you also need at least
+[https://github.com/simon-brooke/mw-parser](*mw-parser*) and 
+[https://github.com/simon-brooke/mw-engine](*mw-engine*). There will be other 
+modules in due course.
+
 ## What this is about
 
 <img alt="Screenshot" id="screenshot" style="float: left; padding-right: 2em;" src="img/screenshot_med.png"/>
