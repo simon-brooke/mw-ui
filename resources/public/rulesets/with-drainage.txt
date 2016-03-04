@@ -1,0 +1,150 @@
+# Human settlement
+
+;; This rule set adds ideas aboutv rainfall and river drainage to the human settlement ruleset.
+;; This depends on transforming the world with the drainage functions before starting running
+;; the rule set, and that isn't done by default because it is computationally expensive.
+
+;; hack to speed up processing on the 'great britain and ireland' map
+if state is sea then state should be sea
+
+;; nomads make their first significant camp near sea because of fish and
+;; shellfish (kitchen-midden people)
+if state is in grassland or heath and more than 3 neighbours are sea and generation is more than 20 then state should be camp
+
+;; sooner or later nomads learn to keep flocks
+if state is in grassland or heath and some neighbours are camp then 1 chance in 2 state should be pasture
+
+;; and more herds support more people
+if state is in grassland or heath and more than 2 neighbours are pasture then 1 chance in 3 state should be camp
+if state is pasture and more than 3 neighbours are pasture and fewer than 1 neighbours are camp and fewer than 1 neighbours within 2 are house then state should be camp
+
+;; the idea of agriculture spreads
+if state is in grassland or heath and some neighbours within 2 are house then state should be pasture
+
+;; nomads don't move on while the have crops growing. That would be silly!
+if state is camp and some neighbours are ploughland then state should be camp
+
+;; Impoverished pasture can't be grazed permanently
+if state is pasture and fertility is less than 2 then 1 chance in 3 state should be heath
+
+;; nomads move on
+if state is camp then 1 chance in 5 state should be waste
+
+;; pasture that's too far from a house or camp will be abandoned
+if state is pasture and fewer than 1 neighbours within 3 are house and fewer than 1 neighbours within 2 are camp then state should be heath
+
+;; markets spring up near settlements
+if state is in grassland or pasture and more than 1 neighbours are house then 1 chance in 10 state should be market
+
+;; good fertile pasture close to settlement will be ploughed for crops
+if state is pasture and fertility is more than 10 and altitude is less than 100 and some neighbours are camp or some neighbours are house then state should be ploughland
+
+if state is ploughland then state should be crop
+
+;; after the crop is harvested, the land is allowed to lie fallow. But cropping
+;; depletes fertility.
+if state is crop then state should be grassland and fertility should be fertility - 1
+
+;; if there's reliable food available, nomads build permanent settlements
+if state is in camp or abandoned and some neighbours are crop then state should be house
+if state is abandoned and some neighbours are pasture then state should be house
+;; people camp near to markets
+if state is in waste or grassland and some neighbours are market then state should be camp
+
+;; a market in a settlement survives
+if state is market and some neighbours are inn then state should be market
+;; a market at a river mouth survives
+if state is market and some neighbours are navigable and some neighbours are sea then state should be market
+;; otherwise markets are transitory
+if state is market then state should be grassland
+
+;; a house near a market in a settlement will become an inn
+if state is house and some neighbours are market and more than 1 neighbours are house then 1 chance in 5 state should be inn
+;; but it will need some local custom to survive
+if state is inn and fewer than 3 neighbours are house then state should be house
+
+;; if there aren't enough resources houses should be abandoned
+;; resources from fishing
+if state is house and more than 2 neighbours are sea then state should be house
+;; from farming
+if state is house and some neighbours are pasture then state should be house
+if state is house and some neighbours are ploughland then state should be house
+if state is house and some neighbours are crop then state should be house
+;; from the market
+if state is house and some neighbours are market then state should be house
+if state is house then 1 chance in 2 state should be abandoned
+if state is abandoned then 1 chance in 5 state should be waste
+
+
+## Vegetation rules
+;; rules which populate the world with plants
+
+;; Occasionally, passing birds plant tree seeds into grassland
+
+if state is grassland then 1 chance in 10 state should be heath
+
+;; heath below the treeline grows gradually into forest
+
+if state is heath and altitude is less than 120 then state should be scrub
+if state is scrub then 1 chance in 5 state should be forest
+
+;; Forest on fertile land grows to climax
+
+if state is forest and fertility is more than 5 and altitude is less than 70 then state should be climax
+
+;; Climax forest occasionally catches fire (e.g. lightning strikes)
+
+if state is climax then 1 chance in 500 state should be fire
+
+;; Forest neighbouring fires is likely to catch fire. So are buildings.
+if state is in forest or climax or camp or house or inn and some neighbours are fire then 1 chance in 3 state should be fire
+
+;; Climax forest near to settlement may be cleared for timber
+if state is climax and more than 3 neighbours within 2 are house then state should be scrub
+
+;; After fire we get waste
+
+if state is fire then state should be waste
+
+;; waste near settlement that is fertile becomes ploughland
+if state is waste and fertility is more than 10 and some neighbours are house or some neighbours are camp then state should be ploughland
+
+;; And after waste we get pioneer species; if there's a woodland seed
+;; source, it's going to be heath, otherwise grassland.
+
+if state is waste and some neighbours are scrub then state should be heath
+if state is waste and some neighbours are forest then state should be heath
+if state is waste and some neighbours are climax then state should be heath
+if state is waste then state should be grassland
+
+
+## Rivers connected to the sea are navigable
+if state is river and some neighbours are sea then state should be navigable
+if state is river and some neighbours are navigable then state should be navigable
+
+## Where navigable water meets the sea, ports are probable
+if state is in grassland or heath or scrub and some neighbours are sea and some neighbours are navigable and some neighbours are house then state should be market
+
+## Potential blockers
+
+;; Forest increases soil fertility.
+if state is in forest or climax then fertility should be fertility + 1
+
+## Initialisation rules
+
+;; Rules which deal with state 'new' will waste less time if they're near the
+;; end of the file
+
+;; below the high-tide line we have sea.
+
+if state is new and altitude is less than 10 then state should be sea
+
+;; above the high-tide line, there's a threshold of water pressure above which we have rivers
+;; the actual threshold will need tuning, 30 is a guess.
+if state is new and flow is more than 30 then state should be river
+
+;; above the snowline we have snow.
+if state is new and altitude is more than 200 then state should be snow
+
+;; otherwise, we have grassland.
+if state is new then state should be grassland
