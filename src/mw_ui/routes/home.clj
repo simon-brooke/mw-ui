@@ -1,4 +1,6 @@
-(ns mw-ui.routes.home
+(ns ^{:doc "Routes which serve the main pages of the application."
+      :author "Simon Brooke"}
+  mw-ui.routes.home
   (:use clojure.walk
         compojure.core)
   (:require [clojure.pprint :only [pprint]]
@@ -15,6 +17,29 @@
             [noir.session :as session]
             [ring.util.response :as response]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;; mw-ui: a servlet user/visualisation interface for MicroWorld.
+;;;;
+;;;; This program is free software; you can redistribute it and/or
+;;;; modify it under the terms of the GNU General Public License
+;;;; as published by the Free Software Foundation; either version 2
+;;;; of the License, or (at your option) any later version.
+;;;;
+;;;; This program is distributed in the hope that it will be useful,
+;;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;;; GNU General Public License for more details.
+;;;;
+;;;; You should have received a copy of the GNU General Public License
+;;;; along with this program; if not, write to the Free Software
+;;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+;;;; USA.
+;;;;
+;;;; Copyright (C) 2014 Simon Brooke
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (defn list-states []
   (sort
@@ -27,19 +52,22 @@
   (layout/render "trusted-content.html"
                  {:title "About MicroWorld"
                   :about-selected "active"
-                  :content (util/md->html "/md/about.md")}))
+                  :content (util/md->html "/md/about.md")
+                  :version (System/getProperty "mw-ui.version")}))
 
 (defn docs-page []
   (layout/render "docs.html" {:title "Documentation"
                               :parser (util/md->html "/md/mw-parser.md" )
                               :states (util/list-resources "/img/tiles" #"([0-9a-z-_]+).png")
                               :lessons (util/list-resources "/md/lesson-plans"  #"([0-9a-z-_]+).md")
-                              :components ["mw-engine" "mw-parser" "mw-ui"]}))
+                              :components ["mw-engine" "mw-parser" "mw-ui"]
+                              :version (System/getProperty "mw-ui.version")}))
 
 (defn home-page []
   "Render the home page."
   (layout/render "trusted-content.html" {:title "Welcome to MicroWorld"
-                              :content (util/md->html "/md/mw-ui.md")}))
+                              :content (util/md->html "/md/mw-ui.md")
+                              :version (System/getProperty "mw-ui.version")}))
 
 (defn inspect-page [request]
   "Open an inspector on the cell at the co-ordinates specified in this request"
