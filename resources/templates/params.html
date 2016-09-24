@@ -1,6 +1,7 @@
 {% extends "templates/base.html" %}
 {% block content %}
 <form action="{{servlet-context}}/params" method="POST">
+  {% csrf-field %}
 	<p class="widget">
 		<label for="ruleset">The rule set to use</label>
 		<select name="ruleset">

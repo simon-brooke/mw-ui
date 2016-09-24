@@ -6,7 +6,7 @@ body {
 /* Overall container div, holds all content of page. Yes, I know it shouldn't have fixed width */
 #main-container{
   clear: both;
-/*  width:100%; */
+  width:100%;
 }
 
 /* footer of the document */
@@ -145,4 +145,3 @@ th, td {
 	text-align: left;
 	padding: 0 0.25em;
 }
-

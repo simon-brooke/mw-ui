@@ -4,7 +4,7 @@
   (:use clojure.walk
         compojure.core)
   (:require [hiccup.core :refer [html]]
-            [mw-parser.bulk :as compiler]
+            [microworld.parser.bulk :as compiler]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]

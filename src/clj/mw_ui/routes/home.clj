@@ -3,9 +3,10 @@
   mw-ui.routes.home
   (:use clojure.walk
         compojure.core)
-  (:require [clojure.pprint :only [pprint]]
+  (:require [clojure.java.io :refer [file resource]]
+            [clojure.pprint :only [pprint]]
             [hiccup.core :refer [html]]
-            [mw-engine.utils :as engine-utils]
+            [microworld.engine.utils :as engine-utils]
             [mw-ui.layout :as layout]
             [mw-ui.render-world :as world]
             [mw-ui.routes.load :as load]
@@ -45,28 +46,28 @@
   (sort
     (filter #(not (nil? %))
             (map #(first (rest (re-matches #"([0-9a-z-]+).png" (.getName %))))
-                 (file-seq (clojure.java.io/file "resources/public/img/tiles"))))))
+                 (file-seq (resource "public/img/tiles"))))))
 
 
 (defn about-page []
   (layout/render "trusted-content.html"
                  {:title "About MicroWorld"
                   :about-selected "active"
-                  :content (util/md->html "/md/about.md")
+                  :content (util/md->html "public/md/about.md")
                   :version (System/getProperty "mw-ui.version")}))
 
 (defn docs-page []
   (layout/render "docs.html" {:title "Documentation"
-                              :parser (util/md->html "/md/mw-parser.md" )
-                              :states (util/list-resources "/img/tiles" #"([0-9a-z-_]+).png")
-                              :lessons (util/list-resources "/md/lesson-plans"  #"([0-9a-z-_]+).md")
-                              :components ["mw-engine" "mw-parser" "mw-ui"]
+                              :parser (util/md->html "public/md/microworld.parser.md" )
+                              :states (util/list-resources "public/img/tiles" #"([0-9a-z-_]+).png")
+                              :lessons (util/list-resources "public/md/lesson-plans"  #"([0-9a-z-_]+).md")
+                              :components ["microworld.engine" "microworld.parser" "mw-ui"]
                               :version (System/getProperty "mw-ui.version")}))
 
 (defn home-page []
   "Render the home page."
   (layout/render "trusted-content.html" {:title "Welcome to MicroWorld"
-                              :content (util/md->html "/md/mw-ui.md")
+                              :content (util/md->html "public/md/mw-ui.md")
                               :version (System/getProperty "mw-ui.version")}))
 
 (defn inspect-page [request]
@@ -91,7 +92,7 @@
                       :x (:x cell)
                       :y (:y cell)
                       :states (util/list-resources
-                                "/img/tiles" #"([0-9a-z-_]+).png")}))))
+                                "public/img/tiles" #"([0-9a-z-_]+).png")}))))
 
 (defn md-page
   "Render the markdown page specified in this request, if any. Probably undesirable,

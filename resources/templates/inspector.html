@@ -4,6 +4,7 @@
 	{{content|safe}}
 	</div>
 	<form action="inspect" method="post">
+    {% csrf-field %}
 		<input type="hidden" name="x" value="{{x}}"/>
 		<input type="hidden" name="y" value="{{y}}"/>
 		<p class="widget">

@@ -1,9 +1,9 @@
 (ns ^{:doc "Utility functions used by other namespaces in this package."
       :author "Simon Brooke"}
   mw-ui.util
-  (:require [noir.io :as io]
+  (:require [clojure.java.io :refer [resource file]]
             [noir.session :as session]
-            [markdown.core :as md]))
+            [markdown.core :refer [md-to-html-string]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -33,16 +33,13 @@
   "reads a markdown file from public/md and returns an HTML string"
   [filename]
   (->>
-    (io/slurp-resource filename)
-    (md/md-to-html-string)))
+    (slurp (resource filename))
+    (md-to-html-string)))
 
 
 (defn list-resources [directory pattern]
   "List resource files matching `pattern` in `directory`."
-  (let
-    [path (str (io/resource-path) directory)]
-    (session/put! :list-resources-path path)
-    (sort
-      (remove nil?
+  (sort
+    (remove nil?
             (map #(first (rest (re-matches pattern (.getName %))))
-                 (file-seq (clojure.java.io/file path)))))))
+                 (file-seq (file (resource directory)))))))

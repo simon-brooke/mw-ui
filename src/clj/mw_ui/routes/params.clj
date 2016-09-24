@@ -4,9 +4,10 @@
   (:use clojure.walk
         clojure.java.io
         compojure.core)
-  (:require [hiccup.core :refer [html]]
-            [mw-engine.heightmap :as heightmap]
-            [mw-parser.bulk :as compiler]
+  (:require [clojure.java.io :refer [resource]]
+            [hiccup.core :refer [html]]
+            [microworld.engine.heightmap :as heightmap]
+            [microworld.parser.bulk :as compiler]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
             [mw-ui.render-world :as world]
@@ -39,9 +40,9 @@
 
 (defn- send-params []
   {:title "Choose your world"
-   :heightmaps (util/list-resources "/img/heightmaps" #"([0-9a-z-_]+).png")
+   :heightmaps (util/list-resources "public/img/heightmaps" #"([0-9a-z-_]+).png")
    :pause (or (session/get :pause) 5)
-   :rulesets (util/list-resources "/rulesets" #"([0-9a-z-_]+).txt")
+   :rulesets (util/list-resources "public/rulesets" #"([0-9a-z-_]+).txt")
    })
 
 
@@ -57,14 +58,14 @@
             map (:heightmap params)
             pause (:pause params)
             rulefile (:ruleset params)
-            rulepath (str "/rulesets/" rulefile ".txt")]
+            rulepath (str "public/rulesets/" rulefile ".txt")]
         (if (not= map "")
           (session/put! :world
                         (heightmap/apply-heightmap
-                          (io/get-resource (str "/img/heightmaps/" map ".png")))))
+                          (resource (str "public/img/heightmaps/" map ".png")))))
         (when (not= rulefile "")
           (session/put! :rule-text (io/slurp-resource rulepath))
-          (session/put! :rules (compiler/compile-file (io/get-resource rulepath))))
+          (session/put! :rules (compiler/compile-file (resource rulepath))))
         (if (not= pause "")
           (session/put! :pause pause))
         (layout/render "params.html"

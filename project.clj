@@ -8,18 +8,21 @@
              "build-signature-timestamp" "unset"
              "Implementation-Version" "unset"
              }
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [mw-engine "0.1.5-SNAPSHOT"]
-                 [mw-parser "0.1.5-SNAPSHOT"]
-                 [lib-noir "0.8.4"]
-                 [ring-server "0.3.1"]
-                 [selmer "0.6.8"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [mw-engine "3.0.0-SNAPSHOT"]
+                 [mw-parser "3.0.0-SNAPSHOT"]
+                 [lib-noir "0.9.9"]
+                 [ring-server "0.4.0"]
+                 [selmer "1.0.9"]
                  [com.taoensso/timbre "3.2.1"]
-                 [com.taoensso/tower "2.0.2"]
-                 [markdown-clj "0.9.44"]
-                 [environ "0.5.0"]
-                 [noir-exception "0.2.2"]]
+                 [com.taoensso/tower "3.0.2"]
+                 [markdown-clj "0.9.89"]
+                 [environ "1.1.0"]
+                 [noir-exception "0.2.5"]]
 
+  :source-paths ["src/clj" "src/cljc"]
+  :license {:name "GNU General Public License v2"
+            :url "http://www.gnu.org/licenses/gpl-2.0.html"}
   :repl-options {:init-ns mw-ui.repl}
   :plugins [[lein-ring "0.8.11"]
             [lein-environ "0.5.0"]
@@ -37,8 +40,8 @@
                        :stacktraces?  false
                        :auto-reload?  false}}
    :dev {:dependencies [[ring-mock "0.1.5"]
-                        [ring/ring-devel "1.3.0"]
-                        [pjstadig/humane-test-output "0.6.0"]]
+                        [ring/ring-devel "1.5.0"]
+                        [pjstadig/humane-test-output "0.8.1"]]
          :injections [(require 'pjstadig.humane-test-output)
                       (pjstadig.humane-test-output/activate!)]
          :env {:dev true}}}

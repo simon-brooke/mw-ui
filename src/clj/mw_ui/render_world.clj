@@ -2,10 +2,10 @@
       :author "Simon Brooke"}
   mw-ui.render-world
   (:require [clojure.java.io :as jio]
-            [mw-engine.core :as engine]
-            [mw-engine.world :as world]
-            [mw-engine.heightmap :as heightmap]
-            [mw-parser.bulk :as compiler]
+            [microworld.engine.core :as engine]
+            [microworld.engine.world :as world]
+            [microworld.engine.heightmap :as heightmap]
+            [microworld.parser.bulk :as compiler]
             [hiccup.core :refer [html]]
             [noir.io :as io]
             [noir.session :as session]))
@@ -70,12 +70,11 @@
   "Render the world implied by the current session as a complete HTML table in a DIV."
   []
   (let [world (or (session/get :world)
-                  (heightmap/apply-heightmap
-                      (io/get-resource "/img/heightmaps/small_hill.png")))
+                  (heightmap/apply-heightmap "public/img/heightmaps/small_hill.png"))
         rules (or (session/get :rules)
                   (do (session/put! :rules
                                     (compiler/compile-file
-                                      (io/get-resource "/rulesets/basic.txt")))
+                                      (jio/resource "public/rulesets/basic.txt")))
                     (session/get :rules)))
         generation (inc (or (session/get :generation) 0))
         w2 (engine/transform-world world rules)

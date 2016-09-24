@@ -1,8 +1,9 @@
 (ns ^{:doc "Route which handles the saving of world state the client."
       :author "Simon Brooke"}
   mw-ui.routes.save
-  (:require [clojure.pprint :as pretty :only [pprint]]
+  (:require [clojure.pprint :refer [pprint]]
             [noir.session :as session]
+            [ring.util.response :as response]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -35,6 +36,6 @@
    any proprietary format."
   (response/header
    (response/response
-    (with-out-str (pretty/pprint  (session/get :world))))
+    (with-out-str (pprint  (session/get :world))))
     "Content-Type" "application/journeyman-mwm; charset=utf-8"))
 

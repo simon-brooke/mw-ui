@@ -4,6 +4,7 @@
   (:require [selmer.parser :as parser]
             [clojure.string :as s]
             [ring.util.response :refer [content-type response]]
+            [ring.util.anti-forgery :refer [anti-forgery-field]]
             [compojure.response :refer [Renderable]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,6 +33,7 @@
 
 (def template-path "templates/")
 
+(parser/add-tag! :csrf-field (fn [_ _] (anti-forgery-field)))
 
 (deftype RenderableTemplate [template params]
   Renderable
