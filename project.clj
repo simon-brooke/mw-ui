@@ -23,7 +23,10 @@
   :repl-options {:init-ns mw-ui.repl}
   :plugins [[lein-ring "0.8.11"]
             [lein-environ "0.5.0"]
-            [lein-marginalia "0.7.1"]]
+            [lein-marginalia "0.7.1"]
+            [io.sarnowski/lein-docker "1.1.0"]]
+  :docker {:image-name "simonbrooke/microworld"
+         :dockerfile "Dockerfile"}
   :ring {:handler mw-ui.handler/app
          :init    mw-ui.handler/init
          :destroy mw-ui.handler/destroy

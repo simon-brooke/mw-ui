@@ -3,6 +3,7 @@
   mw-ui.routes.save
   (:require [clojure.pprint :as pretty :only [pprint]]
             [noir.session :as session]
+            [noir.response :as response]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -33,8 +34,7 @@
    an attempt to prevent the browser trying to do anything clever with it.
    Note that it is saved as a raw Clojure data structure, not as XML or
    any proprietary format."
-  (response/header
-   (response/response
-    (with-out-str (pretty/pprint  (session/get :world))))
-    "Content-Type" "application/journeyman-mwm; charset=utf-8"))
+  (response/content-type
+    "application/journeyman-mwm; charset=utf-8"
+    (with-out-str (pretty/pprint  (session/get :world)))))
 
