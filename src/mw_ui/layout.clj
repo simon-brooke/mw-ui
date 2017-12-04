@@ -3,6 +3,7 @@
   mw-ui.layout
   (:require [selmer.parser :as parser]
             [clojure.string :as s]
+            [ring.util.anti-forgery :refer [anti-forgery-field]]
             [ring.util.response :refer [content-type response]]
             [compojure.response :refer [Renderable]]))
 
@@ -31,6 +32,9 @@
 
 
 (def template-path "templates/")
+
+
+(parser/add-tag! :csrf-field (fn [_ _] (anti-forgery-field)))
 
 
 (deftype RenderableTemplate [template params]

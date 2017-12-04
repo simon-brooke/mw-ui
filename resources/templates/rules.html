@@ -1,6 +1,7 @@
 {% extends "templates/base.html" %}
 {% block content %}
 <form action="{{servlet-context}}/rules" method="POST">
+  {% csrf-field %}
 	<textarea name="src" id="src" rows="10" cols="80">
 {{rule-text}}
 	</textarea>

@@ -78,8 +78,7 @@
                                       (io/get-resource "/rulesets/basic.txt")))
                     (session/get :rules)))
         generation (inc (or (session/get :generation) 0))
-        w2 (engine/transform-world world rules)
-        ]
+        w2 (engine/transform-world world rules)]
     (session/put! :world w2)
     (session/put! :generation generation)
     [:div {:class "world"}
