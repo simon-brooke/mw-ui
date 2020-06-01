@@ -14,3 +14,5 @@ resources/public/docs/mw-*/uberdoc.html
 # Artefacts:
 mw_ui.log
 pom.xml
+
+buildall.tmp.*/
