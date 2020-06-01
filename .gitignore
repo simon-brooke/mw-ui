@@ -8,9 +8,14 @@ pom.xml
 /.lein-*
 /.env
 *.log
+/.calva/
 
 # Links to other places:
 resources/public/docs/mw-*/uberdoc.html
 # Artefacts:
 mw_ui.log
 pom.xml
+
+buildall.tmp.*/
+
+.nrepl-port
