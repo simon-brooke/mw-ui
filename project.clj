@@ -9,8 +9,8 @@
              "Implementation-Version" "unset"
              }
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [mw-engine "0.1.6-SNAPSHOT"]
-                 [mw-parser "0.1.6-SNAPSHOT"]
+                 [mw-engine "0.1.5"]
+                 [mw-parser "0.1.5"]
                  [lib-noir "0.9.9"]
                  [ring-server "0.5.0"]
                  [selmer "1.11.3" :exclusions [cheshire
@@ -23,7 +23,7 @@
                  [markdown-clj "1.0.1"]
                  [environ "1.1.0"]
                  [noir-exception "0.2.5"]]
-
+  :main mw-ui.repl
   :repl-options {:init-ns mw-ui.repl}
   :plugins [[lein-ring "0.8.11"]
             [lein-environ "0.5.0"]

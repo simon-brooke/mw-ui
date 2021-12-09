@@ -37,8 +37,9 @@
     (md/md-to-html-string)))
 
 
-(defn list-resources [directory pattern]
+(defn list-resources 
   "List resource files matching `pattern` in `directory`."
+  [directory pattern]
   (let
     [path (str (io/resource-path) directory)]
     (session/put! :list-resources-path path)
