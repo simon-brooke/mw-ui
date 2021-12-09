@@ -1,7 +1,8 @@
 (ns ^{:doc "Utility functions used by other namespaces in this package."
       :author "Simon Brooke"}
   mw-ui.util
-  (:require [noir.io :as io]
+  (:require [clojure.java.io :refer [file]]
+            [noir.io :as io]
             [noir.session :as session]
             [markdown.core :as md]))
 
@@ -36,13 +37,17 @@
     (io/slurp-resource filename)
     (md/md-to-html-string)))
 
+;; TODO: The reason we can't list files in a jar file, and what to do about it,
+;; is here. Too tired to fix this tonight.
+;; https://stackoverflow.com/questions/46488466/clojure-list-subfolders-in-resources-in-uberjar
 
-(defn list-resources [directory pattern]
+(defn list-resources 
   "List resource files matching `pattern` in `directory`."
+  [directory pattern]
   (let
     [path (str (io/resource-path) directory)]
     (session/put! :list-resources-path path)
     (sort
       (remove nil?
             (map #(first (rest (re-matches pattern (.getName %))))
-                 (file-seq (clojure.java.io/file path)))))))
+                 (file-seq (file path)))))))

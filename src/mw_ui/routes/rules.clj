@@ -1,16 +1,11 @@
 (ns ^{:doc "Route which serves and handles the rules page."
       :author "Simon Brooke"}
   mw-ui.routes.rules
-  (:use clojure.walk
-        compojure.core)
-  (:require [hiccup.core :refer [html]]
+  (:require [clojure.walk :refer [keywordize-keys]]
             [mw-parser.bulk :as compiler]
             [mw-ui.layout :as layout]
-            [mw-ui.util :as util]
-            [mw-ui.render-world :as world]
             [noir.io :as io]
-            [noir.session :as session]
-            [ring.util.response :as response]))
+            [noir.session :as session]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -47,7 +42,7 @@
              :message (str "Successfully compiled "
                            (count rules)
                            " rules")           })
-          true {:rule-text (or
+          :else {:rule-text (or
                              (session/get :rule-text)
                              (io/slurp-resource "/rulesets/basic.txt"))
                 :message "No rules found in request; loading defaults"})
@@ -67,9 +62,9 @@
    the session or from `resources/rulesets/basic.txt` and pass that back."
   ([request]
     (let [processed (process-rules-request request)]
-      (if (:rules processed)
+      (when (:rules processed)
         (session/put! :rules (:rules processed)))
-      (if (:rule-text processed)
+      (when (:rule-text processed)
         (session/put! :rule-text (:rule-text processed)))
       (layout/render "rules.html"
                      (merge {:title "Edit Rules"} processed))))

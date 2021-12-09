@@ -1,14 +1,10 @@
 (ns ^{:doc "Route which handles the upload of worlds/rules from the client."
       :author "Simon Brooke"}
   mw-ui.routes.load
-  (:use clojure.walk
-        compojure.core)
-  (:require [hiccup.core :refer [html]]
+  (:require [clojure.walk :refer [keywordize-keys]]
             [noir.io :as io]
             [noir.session :as session]
-            [ring.util.response :as response]
-            [mw-ui.layout :as layout]
-            ))
+            [mw-ui.layout :as layout]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -38,7 +34,7 @@
   (io/upload-file "/tmp/" file)
   (cond
    (session/put! :world
-                (with-open [eddi (java.io.FileReader. (:tempfile file))] (read)))
+                (with-open [_ (java.io.FileReader. (:tempfile file))] (read)))
     (str "Successfully loaded your world from " (:filename file))))
 
 
@@ -52,8 +48,7 @@
   ([]
    (load-page nil))
   ([request]
-     (let [params (keywordize-keys (:params request))
-           file (:file request)]
+     (let [file (:file request)]
        (try
          (layout/render "load.html"
                         {:title "Load World"

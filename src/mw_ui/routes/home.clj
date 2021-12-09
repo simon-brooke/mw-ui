@@ -1,9 +1,9 @@
 (ns ^{:doc "Routes which serve the main pages of the application."
       :author "Simon Brooke"}
   mw-ui.routes.home
-  (:use clojure.walk
-        compojure.core)
-  (:require [clojure.pprint :only [pprint]]
+  (:require [clojure.java/io :refer [file]]
+            [clojure.walk :refer [keywordize-keys]]
+            [compojure.core :refer [defroutes GET POST]]
             [hiccup.core :refer [html]]
             [mw-engine.utils :as engine-utils]
             [mw-ui.layout :as layout]
@@ -13,7 +13,6 @@
             [mw-ui.routes.params :as params]
             [mw-ui.routes.save :as save]
             [mw-ui.util :as util]
-            [noir.io :as io]
             [noir.session :as session]
             [ring.util.response :as response]))
 
@@ -45,7 +44,8 @@
   (sort
     (filter #(not (nil? %))
             (map #(first (rest (re-matches #"([0-9a-z-]+).png" (.getName %))))
-                 (file-seq (clojure.java.io/file "resources/public/img/tiles"))))))
+                 ;; TODO: this will not work when running from jar; see utils.clj
+                 (file-seq (file "resources/public/img/tiles"))))))
 
 
 (defn about-page []
@@ -63,14 +63,16 @@
                               :components ["mw-engine" "mw-parser" "mw-ui"]
                               :version (System/getProperty "mw-ui.version")}))
 
-(defn home-page []
+(defn home-page 
   "Render the home page."
+  []
   (layout/render "trusted-content.html" {:title "Welcome to MicroWorld"
                               :content (util/md->html "/md/mw-ui.md")
                               :version (System/getProperty "mw-ui.version")}))
 
-(defn inspect-page [request]
+(defn inspect-page 
   "Open an inspector on the cell at the co-ordinates specified in this request"
+  [request]
   (let [params (keywordize-keys (:params request))
         xs (:x params)
         ys (:y params)
@@ -86,7 +88,7 @@
       true
       (layout/render "inspector.html"
                      {:title (format "Inspect cell at %d, %d" x y)
-                      :content (html (world/render-inspector cell world))
+                      :content (html (world/render-inspector cell))
                       :cell cell
                       :x (:x cell)
                       :y (:y cell)

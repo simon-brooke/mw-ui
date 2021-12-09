@@ -34,9 +34,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn format-css-class [statekey]
+(defn format-css-class 
   "Format this statekey, assumed to be a keyword indicating a state in the
    world, into a CSS class"
+  [statekey]
   (subs (str statekey) 1))
 
 
@@ -92,7 +93,8 @@
 
 (defn render-inspector
   "Render in Hiccup format the HTML content of an inspector on this cell."
-  [cell table]
+  ([cell _] (render-inspector cell))
+  ([cell]
   [:table {:class "music-ruled"}
    [:tr
     [:td {:colspan 2 :style "text-align: center;"}
@@ -100,6 +102,6 @@
             :width 64
             :height 64}]]]
    [:tr [:th "Key"][:th "Value"]]
-   (map #(vector :tr (vector :th %)(vector :td (cell %))) (keys cell))])
+   (map #(vector :tr (vector :th %)(vector :td (cell %))) (keys cell))]))
 
 

@@ -35,12 +35,12 @@
 
 (deftype RenderableTemplate [template params]
   Renderable
-  (render [this request]
+  (render [_ request]
     (content-type
       (->> (assoc (merge params {:version (System/getProperty "mw-ui.version")})
                   (keyword (s/replace template #".html" "-selected")) "active"
                   :servlet-context
-                  (if-let [context (:servlet-context request)]
+                  (when-let [context (:servlet-context request)]
                     (.getContextPath context)))
         (parser/render-file (str template-path template))
         response)

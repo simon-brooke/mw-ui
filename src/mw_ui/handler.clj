@@ -46,6 +46,7 @@
    an app server such as Tomcat
    put any initialization code here"
   []
+  ;; TODO fix timbre config!
   ;; (timbre/set-config!
   ;;   [:appenders :rotor]
   ;;   {:min-level :info

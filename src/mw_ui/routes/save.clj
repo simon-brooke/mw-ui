@@ -1,7 +1,7 @@
 (ns ^{:doc "Route which handles the saving of world state the client."
       :author "Simon Brooke"}
   mw-ui.routes.save
-  (:require [clojure.pprint :as pretty :only [pprint]]
+  (:require [clojure.pprint :refer [pprint]]
             [noir.session :as session]
             [noir.response :as response]))
 
@@ -29,12 +29,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn save-page []
+(defn save-page 
   "Save the current world to the browser, using our own custom mime-type in
    an attempt to prevent the browser trying to do anything clever with it.
    Note that it is saved as a raw Clojure data structure, not as XML or
    any proprietary format."
+  []
   (response/content-type
     "application/journeyman-mwm; charset=utf-8"
-    (with-out-str (pretty/pprint  (session/get :world)))))
+    (with-out-str (pprint  (session/get :world)))))
 

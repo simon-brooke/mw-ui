@@ -1,15 +1,11 @@
 (ns ^{:doc "Route which serves and handles the parameters page."
       :author "Simon Brooke"}
   mw-ui.routes.params
-  (:use clojure.walk
-        clojure.java.io
-        compojure.core)
-  (:require [hiccup.core :refer [html]]
+  (:require [clojure.walk :refer [keywordize-keys]]
             [mw-engine.heightmap :as heightmap]
             [mw-parser.bulk :as compiler]
             [mw-ui.layout :as layout]
             [mw-ui.util :as util]
-            [mw-ui.render-world :as world]
             [noir.io :as io]
             [noir.session :as session]))
 
@@ -58,14 +54,14 @@
             pause (:pause params)
             rulefile (:ruleset params)
             rulepath (str "/rulesets/" rulefile ".txt")]
-        (if (not= map "")
+        (when (not= map "")
           (session/put! :world
                         (heightmap/apply-heightmap
                           (io/get-resource (str "/img/heightmaps/" map ".png")))))
         (when (not= rulefile "")
           (session/put! :rule-text (io/slurp-resource rulepath))
           (session/put! :rules (compiler/compile-file (io/get-resource rulepath))))
-        (if (not= pause "")
+        (when (not= pause "")
           (session/put! :pause pause))
         (layout/render "params.html"
                        (merge (send-params)
