@@ -8,7 +8,7 @@
             [noir.util.middleware :refer [app-handler]]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
-            [taoensso.timbre.appenders.rotor :as rotor]
+            ;; [taoensso.timbre.appenders.rotor :as rotor]
             [selmer.parser :as parser]
             [environ.core :refer [env]]))
 
@@ -46,19 +46,19 @@
    an app server such as Tomcat
    put any initialization code here"
   []
-  (timbre/set-config!
-    [:appenders :rotor]
-    {:min-level :info
-     :enabled? true
-     :async? false ; should be always false for rotor
-     :max-message-per-msecs nil
-     :fn rotor/appender-fn})
-  (timbre/set-config!
-    [:shared-appender-config :rotor]
-    {:path "mw_ui.log" :max-size (* 512 1024) :backlog 10})
+  ;; (timbre/set-config!
+  ;;   [:appenders :rotor]
+  ;;   {:min-level :info
+  ;;    :enabled? true
+  ;;    :async? false ; should be always false for rotor
+  ;;    :max-message-per-msecs nil
+  ;;    :fn rotor/appender-fn})
+  ;; (timbre/set-config!
+  ;;   [:shared-appender-config :rotor]
+  ;;   {:path "mw_ui.log" :max-size (* 512 1024) :backlog 10})
 
 
-  (if (env :dev) (parser/cache-off!))
+  (when (env :dev) (parser/cache-off!))
   (timbre/info "mw-ui started successfully"))
 
 

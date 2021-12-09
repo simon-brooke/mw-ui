@@ -1,0 +1,4 @@
+;; 'run once' ruleset to be run after (e.g.) settlement to establish harbours
+;; Doesn't work yet, need to find out why and fix it!
+
+if state is water and more than four neighbours are not water and some neighbours are house then state should be harbour

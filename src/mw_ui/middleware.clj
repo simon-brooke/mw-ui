@@ -1,12 +1,11 @@
 (ns ^{:doc "In truth, boilerplate from Luminus."
       :author "Simon Brooke"}
-  mw-ui.middleware
+ mw-ui.middleware
   (:require [taoensso.timbre :as timbre]
-            [selmer.parser :as parser]
             [environ.core :refer [env]]
             [selmer.middleware :refer [wrap-error-page]]
             [noir-exception.core
-              :refer [wrap-internal-error wrap-exceptions]]))
+             :refer [wrap-internal-error wrap-exceptions]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;

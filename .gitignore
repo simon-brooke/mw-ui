@@ -5,9 +5,12 @@
 pom.xml
 *.jar
 *.class
+/.calva/
 /.lein-*
 /.env
 *.log
+
+.nrepl-port
 
 # Links to other places:
 resources/public/docs/mw-*/uberdoc.html
