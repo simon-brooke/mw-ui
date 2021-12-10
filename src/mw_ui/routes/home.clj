@@ -1,7 +1,7 @@
 (ns ^{:doc "Routes which serve the main pages of the application."
       :author "Simon Brooke"}
   mw-ui.routes.home
-  (:require [clojure.java/io :refer [file]]
+  (:require [clojure.java.io :refer [file]]
             [clojure.walk :refer [keywordize-keys]]
             [compojure.core :refer [defroutes GET POST]]
             [hiccup.core :refer [html]]

@@ -35,9 +35,9 @@
 
 (defn- send-params []
   {:title "Choose your world"
-   :heightmaps (util/list-resources "/img/heightmaps" #"([0-9a-z-_]+).png")
+   :heightmaps (util/list-resources "/img/heightmaps" #"/?([0-9a-z-_]+).png")
    :pause (or (session/get :pause) 5)
-   :rulesets (util/list-resources "/rulesets" #"([0-9a-z-_]+).txt")
+   :rulesets (util/list-resources "/rulesets" #"/?([0-9a-z-_]+).txt")
    })
 
 
