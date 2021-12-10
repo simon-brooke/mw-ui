@@ -31,18 +31,22 @@
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def running-from-filesystem (atom true))
+(def running-from-filesystem 
+  "We assume we're running from the filesystem unless we find we're not."
+  (atom true))
+
 
 (def compile-time-resources
   "The resources which were visible at compile time. If we are running from
    a JAR file, it is highly likely that these are all the resources available
    at run time."
-  (let [n (count (io/resource-path))]
+  (let [f (file "resources/public")
+        n (count (.getCanonicalPath f))]
     (remove nil?
-            (map #(let [s (str %)]
+            (map #(let [s (.getCanonicalPath %)]
                     (when (> (count s) n)
-                      (subs s 56)))
-                 (file-seq (file (io/resource-path)))))))
+                      (subs s n)))
+                 (file-seq f)))))
 
 
 (defn md->html
@@ -57,12 +61,13 @@
   "Do the same processing that list-resources does on names fetched from
    the file system, except on the resource list cached at compile time."
   [path pattern]
+  (timbre/info compile-time-resources)
   (let [n (count path)]
     (remove nil?
             (map #(when (> (count %) n)
                     (let [name (subs % n)]
-                      (first (rest (re-matches pattern name)))))
-                 (filter #(starts-with? % path) 
+                      (last (re-matches pattern name))))
+                (filter #(starts-with? % path) 
                          compile-time-resources)))))
 
 

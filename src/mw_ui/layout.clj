@@ -32,7 +32,6 @@
 
 (def template-path "templates/")
 
-
 (deftype RenderableTemplate [template params]
   Renderable
   (render [_ request]

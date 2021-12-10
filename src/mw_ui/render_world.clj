@@ -1,12 +1,9 @@
 (ns ^{:doc "Render the state of the world as an HTML table."
       :author "Simon Brooke"}
   mw-ui.render-world
-  (:require [clojure.java.io :as jio]
-            [mw-engine.core :as engine]
-            [mw-engine.world :as world]
+  (:require [mw-engine.core :as engine]
             [mw-engine.heightmap :as heightmap]
             [mw-parser.bulk :as compiler]
-            [hiccup.core :refer [html]]
             [noir.io :as io]
             [noir.session :as session]))
 
