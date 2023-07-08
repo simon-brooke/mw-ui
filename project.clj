@@ -24,10 +24,10 @@
               "Implementation-Version" "0.1.6-SNAPSHOT built by Simon Brooke on 2021-05-17 13:31:22+01:00"}
  :min-lein-version "2.0.0"
 
-  :plugins [[lein-ring "0.8.11"]
-            [lein-environ "0.5.0"]
-            [lein-marginalia "0.7.1"]
-            [io.sarnowski/lein-docker "1.1.0"]]
+  :plugins [[lein-ring "0.12.6"]
+            [lein-environ "1.2.0"]
+            [lein-marginalia "0.9.1"]
+            [gorillalabs/lein-docker "1.6.0"]]
   :profiles
   {:uberjar {:aot :all}
    :production {:ring {:open-browser? false
