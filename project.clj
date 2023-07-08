@@ -1,17 +1,17 @@
 (defproject mw-ui "0.1.6-SNAPSHOT"
   :description "Web-based user interface for MicroWorld"
-  :dependencies [[org.clojure/clojure "1.10.3"]
+  :dependencies [[org.clojure/clojure "1.11.1"]
                  [clj-time "0.15.2"] ;; this is a hack. Something in libnoir requires 
                                      ;; JodaTime, but doesn't request it. clj-time does.
                  [mw-engine "0.1.6-SNAPSHOT"]
                  [mw-parser "0.1.6-SNAPSHOT"]
                  [lib-noir "0.9.9"]
                  [ring-server "0.5.0"]
-                 [selmer "1.12.45"]
+                 [selmer "1.12.59"]
                  [hiccup "1.0.5"]
-                 [com.taoensso/timbre "5.1.2"]
+                 [com.taoensso/timbre "6.2.1"]
                  [com.taoensso/tower "3.0.2"]
-                 [markdown-clj "1.10.7"]
+                 [markdown-clj "1.11.4"]
                  [environ "1.2.0"]
                  [noir-exception "0.2.5"]]
    :docker {:image-name "simonbrooke/microworld"
@@ -34,7 +34,7 @@
                        :stacktraces?  false
                        :auto-reload?  false}}
    :dev {:dependencies [[ring-mock "0.1.5"]
-                        [ring/ring-devel "1.9.4"]
+                        [ring/ring-devel "1.10.0"]
                         [pjstadig/humane-test-output "0.11.0"]]
          :injections [(require 'pjstadig.humane-test-output)
                       (pjstadig.humane-test-output/activate!)]
