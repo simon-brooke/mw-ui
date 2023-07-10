@@ -1,10 +1,10 @@
-(defproject mw-ui "0.1.6-SNAPSHOT"
+(defproject mw-ui "0.2.0-SNAPSHOT"
   :description "Web-based user interface for MicroWorld"
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [clj-time "0.15.2"] ;; this is a hack. Something in libnoir requires 
                                      ;; JodaTime, but doesn't request it. clj-time does.
-                 [mw-engine "0.1.6-SNAPSHOT"]
-                 [mw-parser "0.1.6-SNAPSHOT"]
+                 [mw-engine "0.2.0-SNAPSHOT"]
+                 [mw-parser "0.2.0-SNAPSHOT"]
                  [lib-noir "0.9.9"]
                  [ring-server "0.5.0"]
                  [selmer "1.12.59"]
