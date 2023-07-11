@@ -1,0 +1,320 @@
+<html>
+ <head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="../coverage.css"/>  <title> mw_ui/render_world.clj </title>
+ </head>
+ <body>
+<span class="covered" title="1 out of 1 forms covered">
+                001&nbsp;&nbsp;(ns&nbsp;^{:doc&nbsp;&quot;Render&nbsp;the&nbsp;state&nbsp;of&nbsp;the&nbsp;world&nbsp;as&nbsp;an&nbsp;HTML&nbsp;table.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                002&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:author&nbsp;&quot;Simon&nbsp;Brooke&quot;}
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                003&nbsp;&nbsp;&nbsp;&nbsp;mw-ui.render-world
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                004&nbsp;&nbsp;&nbsp;&nbsp;(:require&nbsp;[mw-engine.core&nbsp;:as&nbsp;engine]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                005&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[mw-engine.heightmap&nbsp;:as&nbsp;heightmap]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                006&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[mw-parser.bulk&nbsp;:as&nbsp;compiler]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                007&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[noir.io&nbsp;:as&nbsp;io]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                008&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[noir.session&nbsp;:as&nbsp;session]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                009&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                010&nbsp;&nbsp;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                011&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                012&nbsp;&nbsp;;;;;&nbsp;mw-ui:&nbsp;a&nbsp;servlet&nbsp;user&#x2F;visualisation&nbsp;interface&nbsp;for&nbsp;MicroWorld.
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                013&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                014&nbsp;&nbsp;;;;;&nbsp;This&nbsp;program&nbsp;is&nbsp;free&nbsp;software;&nbsp;you&nbsp;can&nbsp;redistribute&nbsp;it&nbsp;and&#x2F;or
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                015&nbsp;&nbsp;;;;;&nbsp;modify&nbsp;it&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                016&nbsp;&nbsp;;;;;&nbsp;as&nbsp;published&nbsp;by&nbsp;the&nbsp;Free&nbsp;Software&nbsp;Foundation;&nbsp;either&nbsp;version&nbsp;2
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                017&nbsp;&nbsp;;;;;&nbsp;of&nbsp;the&nbsp;License,&nbsp;or&nbsp;(at&nbsp;your&nbsp;option)&nbsp;any&nbsp;later&nbsp;version.
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                018&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                019&nbsp;&nbsp;;;;;&nbsp;This&nbsp;program&nbsp;is&nbsp;distributed&nbsp;in&nbsp;the&nbsp;hope&nbsp;that&nbsp;it&nbsp;will&nbsp;be&nbsp;useful,
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                020&nbsp;&nbsp;;;;;&nbsp;but&nbsp;WITHOUT&nbsp;ANY&nbsp;WARRANTY;&nbsp;without&nbsp;even&nbsp;the&nbsp;implied&nbsp;warranty&nbsp;of
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                021&nbsp;&nbsp;;;;;&nbsp;MERCHANTABILITY&nbsp;or&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE.&nbsp;&nbsp;See&nbsp;the
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                022&nbsp;&nbsp;;;;;&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License&nbsp;for&nbsp;more&nbsp;details.
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                023&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                024&nbsp;&nbsp;;;;;&nbsp;You&nbsp;should&nbsp;have&nbsp;received&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                025&nbsp;&nbsp;;;;;&nbsp;along&nbsp;with&nbsp;this&nbsp;program;&nbsp;if&nbsp;not,&nbsp;write&nbsp;to&nbsp;the&nbsp;Free&nbsp;Software
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                026&nbsp;&nbsp;;;;;&nbsp;Foundation,&nbsp;Inc.,&nbsp;51&nbsp;Franklin&nbsp;Street,&nbsp;Fifth&nbsp;Floor,&nbsp;Boston,&nbsp;MA&nbsp;&nbsp;02110-1301,
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                027&nbsp;&nbsp;;;;;&nbsp;USA.
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                028&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                029&nbsp;&nbsp;;;;;&nbsp;Copyright&nbsp;(C)&nbsp;2014&nbsp;Simon&nbsp;Brooke
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                030&nbsp;&nbsp;;;;;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                031&nbsp;&nbsp;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                032&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                033&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                034&nbsp;&nbsp;(defn&nbsp;format-css-class&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                035&nbsp;&nbsp;&nbsp;&nbsp;&quot;Format&nbsp;this&nbsp;statekey,&nbsp;assumed&nbsp;to&nbsp;be&nbsp;a&nbsp;keyword&nbsp;indicating&nbsp;a&nbsp;state&nbsp;in&nbsp;the
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                036&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;world,&nbsp;into&nbsp;a&nbsp;CSS&nbsp;class&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                037&nbsp;&nbsp;&nbsp;&nbsp;[statekey]
+                </span><br/>
+<span class="not-covered" title="0 out of 6 forms covered">
+                038&nbsp;&nbsp;&nbsp;&nbsp;(subs&nbsp;(str&nbsp;statekey)&nbsp;1))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                039&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                040&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                041&nbsp;&nbsp;(defn&nbsp;format-image-path
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                042&nbsp;&nbsp;&nbsp;&nbsp;&quot;Render&nbsp;this&nbsp;statekey,&nbsp;assumed&nbsp;to&nbsp;be&nbsp;a&nbsp;keyword&nbsp;indicating&nbsp;a&nbsp;state&nbsp;in&nbsp;the
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                043&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;world,&nbsp;into&nbsp;a&nbsp;path&nbsp;which&nbsp;should&nbsp;recover&nbsp;the&nbsp;corresponding&nbsp;image&nbsp;file.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                044&nbsp;&nbsp;&nbsp;&nbsp;[statekey]
+                </span><br/>
+<span class="not-covered" title="0 out of 6 forms covered">
+                045&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;&quot;img&#x2F;tiles&#x2F;%s.png&quot;&nbsp;(format-css-class&nbsp;statekey)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                046&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                047&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                048&nbsp;&nbsp;(defn&nbsp;format-mouseover&nbsp;[cell]
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                049&nbsp;&nbsp;&nbsp;&nbsp;(str&nbsp;cell))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                050&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                051&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                052&nbsp;&nbsp;(defn&nbsp;render-cell
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                053&nbsp;&nbsp;&nbsp;&nbsp;&quot;Render&nbsp;this&nbsp;world&nbsp;cell&nbsp;as&nbsp;a&nbsp;Hiccup&nbsp;table&nbsp;cell.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                054&nbsp;&nbsp;&nbsp;&nbsp;[cell]
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                055&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[state&nbsp;(:state&nbsp;cell)]
+                </span><br/>
+<span class="not-covered" title="0 out of 11 forms covered">
+                056&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:td&nbsp;{:class&nbsp;(format-css-class&nbsp;state)&nbsp;:title&nbsp;(format-mouseover&nbsp;cell)}
+                </span><br/>
+<span class="not-covered" title="0 out of 13 forms covered">
+                057&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:a&nbsp;{:href&nbsp;(format&nbsp;&quot;inspect?x=%d&amp;y=%d&quot;&nbsp;(:x&nbsp;cell)&nbsp;(:y&nbsp;cell))}
+                </span><br/>
+<span class="not-covered" title="0 out of 11 forms covered">
+                058&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:img&nbsp;{:alt&nbsp;(:state&nbsp;cell)&nbsp;:src&nbsp;(format-image-path&nbsp;state)}]]]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                059&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                060&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                061&nbsp;&nbsp;(defn&nbsp;render-world-row
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                062&nbsp;&nbsp;&nbsp;&nbsp;&quot;Render&nbsp;this&nbsp;world&nbsp;row&nbsp;as&nbsp;a&nbsp;Hiccup&nbsp;table&nbsp;row.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                063&nbsp;&nbsp;&nbsp;&nbsp;[row]
+                </span><br/>
+<span class="not-covered" title="0 out of 10 forms covered">
+                064&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;vector&nbsp;(cons&nbsp;:tr&nbsp;(map&nbsp;render-cell&nbsp;row))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                065&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                066&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                067&nbsp;&nbsp;(defn&nbsp;render-world-table
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                068&nbsp;&nbsp;&nbsp;&nbsp;&quot;Render&nbsp;the&nbsp;world&nbsp;implied&nbsp;by&nbsp;the&nbsp;current&nbsp;session&nbsp;as&nbsp;a&nbsp;complete&nbsp;HTML&nbsp;table&nbsp;in&nbsp;a&nbsp;DIV.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                069&nbsp;&nbsp;&nbsp;&nbsp;[]
+                </span><br/>
+<span class="not-covered" title="0 out of 9 forms covered">
+                070&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[world&nbsp;(or&nbsp;(session&#x2F;get&nbsp;:world)
+                </span><br/>
+<span class="not-covered" title="0 out of 1 forms covered">
+                071&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(heightmap&#x2F;apply-heightmap
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                072&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(io&#x2F;get-resource&nbsp;&quot;&#x2F;img&#x2F;heightmaps&#x2F;small_hill.png&quot;)))
+                </span><br/>
+<span class="not-covered" title="0 out of 8 forms covered">
+                073&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rules&nbsp;(or&nbsp;(session&#x2F;get&nbsp;:rules)
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                074&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;(session&#x2F;put!&nbsp;:rules
+                </span><br/>
+<span class="not-covered" title="0 out of 2 forms covered">
+                075&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(compiler&#x2F;compile-file
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                076&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(io&#x2F;get-resource&nbsp;&quot;&#x2F;rulesets&#x2F;basic.txt&quot;)))
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                077&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(session&#x2F;get&nbsp;:rules)))
+                </span><br/>
+<span class="not-covered" title="0 out of 9 forms covered">
+                078&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;generation&nbsp;(inc&nbsp;(or&nbsp;(session&#x2F;get&nbsp;:generation)&nbsp;0))
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                079&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w2&nbsp;(engine&#x2F;transform-world&nbsp;world&nbsp;rules)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                080&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                081&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(session&#x2F;put!&nbsp;:world&nbsp;w2)
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                082&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(session&#x2F;put!&nbsp;:generation&nbsp;generation)
+                </span><br/>
+<span class="not-covered" title="0 out of 5 forms covered">
+                083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:div&nbsp;{:class&nbsp;&quot;world&quot;}
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                084&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;vector
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                085&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;:table
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                086&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;render-world-row&nbsp;w2)))
+                </span><br/>
+<span class="not-covered" title="0 out of 2 forms covered">
+                087&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:p
+                </span><br/>
+<span class="not-covered" title="0 out of 4 forms covered">
+                088&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(str&nbsp;&quot;Generation&nbsp;&quot;&nbsp;generation)]]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                089&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                090&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                091&nbsp;&nbsp;(defn&nbsp;render-inspector
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                092&nbsp;&nbsp;&nbsp;&nbsp;&quot;Render&nbsp;in&nbsp;Hiccup&nbsp;format&nbsp;the&nbsp;HTML&nbsp;content&nbsp;of&nbsp;an&nbsp;inspector&nbsp;on&nbsp;this&nbsp;cell.&quot;
+                </span><br/>
+<span class="not-covered" title="0 out of 3 forms covered">
+                093&nbsp;&nbsp;&nbsp;&nbsp;([cell&nbsp;_]&nbsp;(render-inspector&nbsp;cell))
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                094&nbsp;&nbsp;&nbsp;&nbsp;([cell]
+                </span><br/>
+<span class="not-covered" title="0 out of 5 forms covered">
+                095&nbsp;&nbsp;&nbsp;&nbsp;[:table&nbsp;{:class&nbsp;&quot;music-ruled&quot;}
+                </span><br/>
+<span class="not-covered" title="0 out of 2 forms covered">
+                096&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:tr
+                </span><br/>
+<span class="not-covered" title="0 out of 7 forms covered">
+                097&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:td&nbsp;{:colspan&nbsp;2&nbsp;:style&nbsp;&quot;text-align:&nbsp;center;&quot;}
+                </span><br/>
+<span class="not-covered" title="0 out of 17 forms covered">
+                098&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:img&nbsp;{:src&nbsp;(str&nbsp;&quot;img&#x2F;tiles&#x2F;&quot;&nbsp;(name&nbsp;(:state&nbsp;cell))&nbsp;&quot;.png&quot;)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                099&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:width&nbsp;64
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:height&nbsp;64}]]]
+                </span><br/>
+<span class="not-covered" title="0 out of 8 forms covered">
+                101&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[:tr&nbsp;[:th&nbsp;&quot;Key&quot;][:th&nbsp;&quot;Value&quot;]]
+                </span><br/>
+<span class="not-covered" title="0 out of 19 forms covered">
+                102&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;#(vector&nbsp;:tr&nbsp;(vector&nbsp;:th&nbsp;%)(vector&nbsp;:td&nbsp;(cell&nbsp;%)))&nbsp;(keys&nbsp;cell))]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                103&nbsp;&nbsp;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                104&nbsp;&nbsp;
+                </span><br/>
+ </body>
+</html>
